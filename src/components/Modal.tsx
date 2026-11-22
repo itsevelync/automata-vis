@@ -5,11 +5,13 @@ export function Modal({
   open,
   title,
   onClose,
+  showClose=true,
   children,
 }: {
   open: boolean;
   title: string;
   onClose: () => void;
+  showClose?: boolean;
   children: ReactNode;
 }) {
   useEffect(() => {
@@ -34,9 +36,9 @@ export function Modal({
       <div className="modal" role="dialog" aria-modal="true" aria-label={title}>
         <div className="modal-head">
           <h2>{title}</h2>
-          <button type="button" onClick={onClose}>
+          {showClose && <button type="button" onClick={onClose}>
             Close
-          </button>
+          </button>}
         </div>
         <div className="modal-body">{children}</div>
       </div>

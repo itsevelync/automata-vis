@@ -222,7 +222,7 @@ Write the placement after the node name: `\node[state] (q1) [below=of qa] {$q_1$
 
 - One cardinal step: `right=of`, `left=of`, `above=of`, or `below=of`, with no extra dimension.
 - `k` cardinal steps, `k ≠ 1`: `right=<k*N> of <id>` (same for `left`, `above`, and `below`). Two cells right at `3cm` is `right=6cm of q0`.
-- Both axes nonzero: `below right=of`, `below left=of`, `above right=of`, or `above left=of`. These are positioning-library options. Each axis is an independent center distance. They are not a legacy corner shift and not an `xshift` or `yshift`.
+- Both axes nonzero: `below right=of`, `below left=of`, `above right=of`, or `above left=of`. These are positioning-library options. Each axis is an independent center distance.
 - Add `<vertical> and <horizontal>` only when a part is not `N`. The first length is vertical. Two cells right and one cell below at `3cm` is `below right=3cm and 6cm of <id>`. One step on both axes is just `below right=of <id>`.
 
 A gap is preserved. If the cell immediately left of a node is empty, the left anchor may be two or more columns away, and the export uses `right=<k*N> of` that node rather than inventing a state in the hole.

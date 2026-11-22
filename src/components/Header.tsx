@@ -71,7 +71,8 @@ export function Header() {
       </div>
       <Modal
         open={pendingKind !== null}
-        title="Change automata type"
+        title="Warning"
+        showClose={false}
         onClose={() => setPendingKind(null)}
       >
         <p>Changing the automata type will delete the current state machine.</p>
@@ -80,7 +81,7 @@ export function Header() {
             Cancel
           </button>
           <button type="button" onClick={confirmKind}>
-            Delete
+            I understand
           </button>
         </div>
       </Modal>

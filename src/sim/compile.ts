@@ -64,9 +64,6 @@ export function compile(kind: AutomataKind, nodes: DiagramNode[], edges: Diagram
   const initials = nodes.filter((node) => node.initial);
   if (nodes.length > 0 && initials.length === 0) errors.push("Mark one state as initial.");
   if (initials.length > 1) errors.push("Mark only one state as initial.");
-  if (nodes.length > 0 && !nodes.some((node) => node.accepting)) {
-    errors.push("Mark at least one state as accepting.");
-  }
   const transitions: CompiledTransition[] = [];
   for (const edge of edges) {
     const raw = edge.lines && edge.lines.length > 0 ? edge.lines : [edge.label ?? ""];

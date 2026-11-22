@@ -13,6 +13,19 @@ export function mathSource(label: string): { source: string; displayMode: boolea
 }
 
 const EPSILON = "\\varepsilon";
+const BLANK = "\\textvisiblespace";
+const INPUT_SYMBOLS: [string, string][] = [
+  [BLANK, "\u2423"],
+  [EPSILON, "\u03b5"],
+];
+
+export function labelToInput(value: string): string {
+  return INPUT_SYMBOLS.reduce((text, [command, symbol]) => text.replaceAll(command, symbol), value);
+}
+
+export function inputToLabel(value: string): string {
+  return INPUT_SYMBOLS.reduce((text, [command, symbol]) => text.replaceAll(symbol, command), value);
+}
 
 export function displayEdgeLabel(lines: string[], kind: AutomataKind): string {
   return joinLabels(lines.map((line) => renderEdgeLine(line, kind)));

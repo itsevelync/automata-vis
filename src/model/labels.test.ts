@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { isValidId, nextStateId } from "./ids";
-import { displayEdgeLabel, formatLabel, joinLabels, joinTransition, splitTransition } from "./labels";
+import {
+  displayEdgeLabel,
+  formatLabel,
+  inputToLabel,
+  joinLabels,
+  joinTransition,
+  labelToInput,
+  splitTransition,
+} from "./labels";
 
 describe("formatLabel", () => {
   it("wraps plain math", () => {
@@ -21,6 +29,13 @@ describe("formatLabel", () => {
     expect(formatLabel("\\begin{array}{c} a \\end{array}")).toBe(
       "$\\begin{array}{c} a \\end{array}$",
     );
+  });
+});
+
+describe("label input symbols", () => {
+  it("shows epsilon and visible space in the input", () => {
+    expect(labelToInput("\\varepsilon\\to\\textvisiblespace")).toBe("\u03b5\\to\u2423");
+    expect(inputToLabel("\u03b5\u2423")).toBe("\\varepsilon\\textvisiblespace");
   });
 });
 

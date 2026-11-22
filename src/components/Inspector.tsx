@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { LatexLabel } from "../canvas/LatexLabel";
 import {
   displayEdgeLabel,
+  inputToLabel,
   joinLabels,
   joinTransition,
+  labelToInput,
   splitTransition,
   type TransitionKind,
 } from "../model/labels";
@@ -254,21 +256,22 @@ function LabelFields({
     const index = Math.min(focused.line, lines.length - 1);
     const part = format === "plain" ? 0 : focused.part;
     const input = inputs.current[fieldKey(index, part)];
+    const glyph = labelToInput(command);
     if (format === "plain") {
-      const line = lines[index] ?? "";
-      const start = input?.selectionStart ?? line.length;
-      const end = input?.selectionEnd ?? line.length;
-      writeLine(index, line.slice(0, start) + command + line.slice(end));
-      placeCursor(index, 0, start + command.length);
+      const shown = labelToInput(lines[index] ?? "");
+      const start = input?.selectionStart ?? shown.length;
+      const end = input?.selectionEnd ?? shown.length;
+      writeLine(index, inputToLabel(shown.slice(0, start) + glyph + shown.slice(end)));
+      placeCursor(index, 0, start + glyph.length);
       return;
     }
     const parts = splitTransition(lines[index] ?? "", format);
-    const field = parts[part] ?? "";
-    const start = input?.selectionStart ?? field.length;
-    const end = input?.selectionEnd ?? field.length;
-    parts[part] = field.slice(0, start) + command + field.slice(end);
+    const shown = labelToInput(parts[part] ?? "");
+    const start = input?.selectionStart ?? shown.length;
+    const end = input?.selectionEnd ?? shown.length;
+    parts[part] = inputToLabel(shown.slice(0, start) + glyph + shown.slice(end));
     writeLine(index, joinTransition(parts, format));
-    placeCursor(index, part, start + command.length);
+    placeCursor(index, part, start + glyph.length);
   }
 
   function placeCursor(index: number, part: number, cursor: number) {
@@ -305,10 +308,10 @@ function LabelFields({
                 ref={(element) => {
                   inputs.current[fieldKey(index)] = element;
                 }}
-                value={line}
+                value={labelToInput(line)}
                 placeholder={caption || index === 0 ? placeholder : ""}
                 onFocus={() => setFocused({ line: index, part: 0 })}
-                onChange={(event) => writeLine(index, event.target.value)}
+                onChange={(event) => writeLine(index, inputToLabel(event.target.value))}
               />
             ) : (
               <TransitionFields
@@ -372,7 +375,7 @@ function TransitionFields({
 
   function update(part: 0 | 1 | 2, value: string) {
     const next = parts.slice() as [string, string, string];
-    next[part] = value;
+    next[part] = inputToLabel(value);
     if (kind === "tm" && next[2] !== "L") next[2] = "R";
     onChange(joinTransition(next, kind));
   }
@@ -393,7 +396,7 @@ function TransitionFields({
         key={field.part}
         ref={(element) => inputRef(field.part, element)}
         aria-label={field.name}
-        value={parts[field.part]}
+        value={labelToInput(parts[field.part])}
         placeholder={placeholder}
         onFocus={() => onFocus(field.part)}
         onChange={(event) => update(field.part, event.target.value)}

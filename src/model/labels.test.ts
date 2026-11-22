@@ -57,6 +57,7 @@ describe("transition labels", () => {
 
   it("renders empty inputs as varepsilon", () => {
     expect(displayEdgeLabel([""], "dfa")).toBe("\\varepsilon");
+    expect(displayEdgeLabel(["0", "1"], "dfa")).toBe("0,1");
     expect(displayEdgeLabel(["1\\to,R"], "tm")).toBe("1\\to\\varepsilon,R");
     expect(displayEdgeLabel([""], "tm")).toBe("\\varepsilon\\to\\varepsilon,R");
     expect(displayEdgeLabel(["a,\\to"], "pda")).toBe("a,\\varepsilon\\to\\varepsilon");

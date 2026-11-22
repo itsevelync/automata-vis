@@ -28,7 +28,9 @@ export function inputToLabel(value: string): string {
 }
 
 export function displayEdgeLabel(lines: string[], kind: AutomataKind): string {
-  return joinLabels(lines.map((line) => renderEdgeLine(line, kind)));
+  const rendered = lines.map((line) => renderEdgeLine(line, kind));
+  if (kind === "dfa") return rendered.join(",");
+  return joinLabels(rendered);
 }
 
 export function transitionText(

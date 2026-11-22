@@ -278,7 +278,7 @@ export function DiagramCanvas() {
           <li>Drag the background to pan. Scroll or pinch on the canvas to zoom.</li>
           <li>Use the sidebar to edit labels, initial and accepting marks, and edge direction.</li>
           <li>Defaults changes the node distance. It rescales the grid and does not move cells.</li>
-          <li>Add label adds another line. Only extra lines can be deleted. Two or more lines become a centered array.</li>
+          <li>Add label adds another symbol. DFA/NFA symbols are comma-separated. PDA and TM lines become a centered array.</li>
           <li>The symbol buttons insert \varepsilon, \to, and \textvisiblespace.</li>
           <li>Swap reverses an edge.</li>
           <li>Run steps the diagram on an input. Build is read-only while running.</li>

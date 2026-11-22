@@ -41,7 +41,32 @@ describe("simulator", () => {
     const edges = [edge("e1", "q0", "q1", "\\varepsilon")];
     const engine = run("dfa", nodes, edges, "");
     expect(engine.status).toBe("accepted");
-    expect(engine.steps).toBe(1);
+  });
+
+  it("treats read-1 and read-1-then-epsilon as one configuration", () => {
+    const nodes = [node("q0", { initial: true }), node("q1"), node("q2"), node("q3", { accepting: true })];
+    const edges = [
+      edge("e1", "q0", "q1", "1"),
+      edge("e2", "q0", "q2", "1"),
+      edge("e3", "q2", "q1", "\\varepsilon"),
+      edge("e4", "q1", "q3", "0"),
+    ];
+    const machine = compile("dfa", nodes, edges);
+    const symbols = tokenize("10");
+    const engine = stepEngine(createEngine(machine, symbols), machine, symbols);
+    const states = engine.frontier.map((id) => engine.configs.find((config) => config.id === id)?.state);
+    expect(states.filter((state) => state === "q1")).toEqual(["q1"]);
+  });
+
+  it("explores a repeated configuration once", () => {
+    const nodes = [node("q0", { initial: true }), node("q1"), node("q2", { accepting: true })];
+    const edges = [edge("e1", "q0", "q1", "a"), edge("e2", "q0", "q1", "a"), edge("e3", "q1", "q2", "b")];
+    const machine = compile("dfa", nodes, edges);
+    let engine = createEngine(machine, tokenize("ab"));
+    engine = stepEngine(engine, machine, tokenize("ab"));
+    expect(engine.frontier).toHaveLength(1);
+    engine = stepEngine(engine, machine, tokenize("ab"));
+    expect(engine.status).toBe("accepted");
   });
 
   it("accepts when one branch matches", () => {

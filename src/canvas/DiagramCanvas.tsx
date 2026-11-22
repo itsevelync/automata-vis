@@ -10,6 +10,7 @@ import { EDGE_STROKE, EdgeLabel, buildEdgeCurve } from "./AutomataEdge";
 import { PT_PX, cellSizePx, centerToCell } from "./geometry";
 import { StateNode } from "./StateNode";
 import { curvePath } from "./tikzPath";
+import { MdAdd, MdHome, MdRemove } from "react-icons/md";
 
 type View = { x: number; y: number; zoom: number };
 
@@ -292,13 +293,13 @@ export function DiagramCanvas() {
       </Modal>
       <div className="canvas-controls">
         <button type="button" onClick={() => zoomBy(1.15)}>
-          +
+          <MdAdd />
         </button>
         <button type="button" onClick={() => zoomBy(1 / 1.15)}>
-          −
+          <MdRemove />
         </button>
         <button type="button" onClick={() => fit()}>
-          Fit
+          <MdHome />
         </button>
       </div>
       <div

@@ -18,10 +18,12 @@ interface RunState {
   activeEdges: string[];
   machine: Machine | null;
   engine: Engine | null;
+  history: Engine[];
   setInput: (input: string) => void;
   setSpeed: (speed: number) => void;
   load: () => void;
   step: () => void;
+  back: () => void;
   skip: () => void;
   play: () => void;
   pause: () => void;
@@ -54,6 +56,7 @@ function cleared() {
     activeEdges: [] as string[],
     machine: null,
     engine: null,
+    history: [] as Engine[],
   };
 }
 
@@ -73,16 +76,28 @@ export const useRun = create<RunState>((set, get) => ({
     const symbols = tokenize(get().input);
     const engine = createEngine(machine, symbols);
     const status: RunStatus = engine.status === "ready" ? "ready" : engine.status;
-    set({ machine, symbols, engine, status, ...view(engine) });
+    set({ machine, symbols, engine, status, history: [], ...view(engine) });
   },
   step: () => {
-    const { engine, machine, symbols, status } = get();
+    const { engine, machine, symbols, status, history } = get();
     if (!engine || !machine || engine.status !== "ready") return;
     const next = stepEngine(engine, machine, symbols);
     set({
+      history: [...history, engine],
       engine: next,
       status: next.status === "ready" ? (status === "running" ? "running" : "paused") : next.status,
       ...view(next),
+    });
+  },
+  back: () => {
+    const { history, status } = get();
+    if (history.length === 0 || status === "idle" || status === "running") return;
+    const engine = history[history.length - 1];
+    set({
+      history: history.slice(0, -1),
+      engine,
+      status: engine.status === "ready" ? (engine.steps === 0 ? "ready" : "paused") : engine.status,
+      ...view(engine),
     });
   },
   skip: () => {

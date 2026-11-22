@@ -5,6 +5,7 @@ import { compile, BLANK } from "../sim/compile";
 import type { SimConfig } from "../sim/step";
 import { useDiagram } from "../store/diagram";
 import { useRun } from "../store/run";
+import { MdPause, MdPlayArrow, MdSkipNext, MdSkipPrevious } from "react-icons/md";
 
 export function RunPanel() {
   const automataKind = useDiagram((state) => state.automataKind);
@@ -22,6 +23,8 @@ export function RunPanel() {
   const frontier = useRun((state) => state.frontier);
   const load = useRun((state) => state.load);
   const step = useRun((state) => state.step);
+  const back = useRun((state) => state.back);
+  const history = useRun((state) => state.history);
   const skip = useRun((state) => state.skip);
   const play = useRun((state) => state.play);
   const pause = useRun((state) => state.pause);
@@ -48,9 +51,18 @@ export function RunPanel() {
     return () => window.clearInterval(timer);
   }, [status, speed]);
 
-  const live = frontier
-    .map((id) => configs.find((config) => config.id === id))
-    .filter((config): config is SimConfig => Boolean(config));
+  const configsById = useMemo(
+    () => new Map(configs.map((config) => [config.id, config])),
+    [configs],
+  );
+  const live: SimConfig[] = [];
+  const liveKeys = new Set<string>();
+  for (const id of frontier) {
+    const config = configsById.get(id);
+    if (!config || liveKeys.has(config.key)) continue;
+    liveKeys.add(config.key);
+    live.push(config);
+  }
   const finished =
     status === "accepted" || status === "rejected" || status === "limited";
   const halted = configs.filter((config) => config.outcome !== "open");
@@ -68,47 +80,56 @@ export function RunPanel() {
             <input
               ref={inputRef}
               value={input}
+              disabled={status !== "idle"}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {
-                if (event.key === "Enter") load();
+                if (event.key === "Enter" && status === "idle") load();
               }}
             />
           </label>
           <button
             type="button"
-            onClick={load}
-            disabled={machine.errors.length > 0}
+            onClick={status === "idle" ? load : reset}
+            disabled={status === "idle" && machine.errors.length > 0}
           >
-            Load
+            {status === "idle" ? "Load" : "Edit"}
           </button>
+          {status !== "idle" ? (
+          <>
           <div className="run-controls">
+            <button
+              type="button"
+              onClick={back}
+              disabled={history.length === 0 || status === "running"}
+            >
+              <MdSkipPrevious />
+            </button>
             <button
               type="button"
               onClick={play}
               disabled={status !== "ready" && status !== "paused"}
             >
-              Play
+              <MdPlayArrow />
             </button>
             <button
               type="button"
               onClick={pause}
               disabled={status !== "running"}
             >
-              Pause
-            </button>
-            <button
-              type="button"
-              onClick={stop}
-              disabled={status === "idle"}
-            >
-              Stop
+              <MdPause />
             </button>
             <button
               type="button"
               onClick={step}
               disabled={status !== "ready" && status !== "paused"}
             >
-              Step
+              <MdSkipNext />
+            </button>
+            <button
+              type="button"
+              onClick={stop}
+            >
+              Reset
             </button>
             <button
               type="button"
@@ -155,6 +176,8 @@ export function RunPanel() {
               ))
             )}
           </p>
+          </>
+          ) : null}
           {message ? (
             <p className={finished ? "run-result" : "muted"}>
               {message}
@@ -194,24 +217,8 @@ export function RunPanel() {
                 type="button"
                 onClick={() => setTraceOpen(true)}
               >
-                States visited
+                Open decision tree
               </button>
-              <p className="muted">
-                {halted.length} halted branch
-                {halted.length === 1 ? "" : "es"},{" "}
-                {
-                  configs.filter(
-                    (config) => config.outcome === "loop",
-                  ).length
-                }{" "}
-                loop
-                {configs.filter(
-                  (config) => config.outcome === "loop",
-                ).length === 1
-                  ? ""
-                  : "s"}
-                .
-              </p>
               <Modal
                 open={traceOpen}
                 title="Decision tree"
@@ -390,7 +397,7 @@ function Trace({
   for (const config of configs) {
     if (!config.parentId) continue;
     const parent = byId.get(config.parentId);
-    if (!parent) continue;
+    if (!parent || parent.steps === config.steps) continue;
     const key = `${parent.steps}:${parent.state}:${config.steps}:${config.state}`;
     if (seen.has(key)) continue;
     seen.add(key);

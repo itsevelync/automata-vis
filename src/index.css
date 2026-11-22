@@ -28,6 +28,10 @@ textarea {
   color: inherit;
 }
 
+input:disabled {
+  opacity: 0.5;
+}
+
 button {
   border: 1px solid #000000;
   padding: 0.35rem 0.7rem;
@@ -165,6 +169,13 @@ header p {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+}
+
+.canvas-controls button,
+.run-controls button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .state-anchor {

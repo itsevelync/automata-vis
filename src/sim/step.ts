@@ -22,6 +22,7 @@ export interface Engine {
   nextId: number;
   configs: SimConfig[];
   frontier: string[];
+  seen: string[];
 }
 
 function readTape(tape: Record<number, string>, head: number): string {
@@ -63,9 +64,18 @@ export function isAccept(machine: Machine, symbols: string[], config: SimConfig)
   return config.cursor >= symbols.length;
 }
 
-function applicable(machine: Machine, symbols: string[], config: SimConfig): CompiledTransition[] {
-  return machine.transitions.filter((transition) => {
-    if (transition.source !== config.state) return false;
+function transitionsFrom(machine: Machine): Map<string, CompiledTransition[]> {
+  const bySource = new Map<string, CompiledTransition[]>();
+  for (const transition of machine.transitions) {
+    const list = bySource.get(transition.source);
+    if (list) list.push(transition);
+    else bySource.set(transition.source, [transition]);
+  }
+  return bySource;
+}
+
+function applicable(transitions: CompiledTransition[], machine: Machine, symbols: string[], config: SimConfig): CompiledTransition[] {
+  return transitions.filter((transition) => {
     if (machine.kind === "tm") return transition.read === readTape(config.tape, config.head);
     if (transition.read && (config.cursor >= symbols.length || symbols[config.cursor] !== transition.read)) {
       return false;
@@ -115,6 +125,52 @@ function finish(engine: Engine): Engine {
   return { ...engine, status: "rejected", message: "Rejected.", frontier: [] };
 }
 
+function remember(seen: Set<string>, child: SimConfig, byId: Map<string, SimConfig>): "new" | "loop" | "seen" {
+  if (seen.has(child.key)) return pathHas(child, byId) ? "loop" : "seen";
+  seen.add(child.key);
+  return "new";
+}
+
+function closeEpsilon(
+  machine: Machine,
+  symbols: string[],
+  seeds: string[],
+  configs: SimConfig[],
+  byId: Map<string, SimConfig>,
+  bySource: Map<string, CompiledTransition[]>,
+  seen: Set<string>,
+  nextId: number,
+): { frontier: string[]; nextId: number } {
+  const frontier: string[] = [];
+  const queue = [...seeds];
+  while (queue.length > 0) {
+    const current = byId.get(queue.shift()!);
+    if (!current || current.outcome !== "open") continue;
+    frontier.push(current.id);
+    const silent = (bySource.get(current.state) ?? []).filter((transition) => isEpsilon(transition.read));
+    for (const transition of silent) {
+      const child = apply(machine, current, transition, `c${nextId}`);
+      nextId += 1;
+      child.steps = current.steps;
+      const status = remember(seen, child, byId);
+      if (status === "loop") {
+        configs.push({ ...child, outcome: "loop", reason: "repeated configuration" });
+        continue;
+      }
+      if (status === "seen") continue;
+      if (isAccept(machine, symbols, child)) {
+        configs.push({ ...child, outcome: "accept", reason: "accepting state" });
+        byId.set(child.id, child);
+        continue;
+      }
+      configs.push(child);
+      byId.set(child.id, child);
+      queue.push(child.id);
+    }
+  }
+  return { frontier: [...new Set(frontier)], nextId };
+}
+
 export function createEngine(machine: Machine, symbols: string[]): Engine {
   const tape: Record<number, string> = {};
   symbols.forEach((symbol, index) => {
@@ -142,25 +198,38 @@ export function createEngine(machine: Machine, symbols: string[]): Engine {
     nextId: 1,
     configs: [root],
     frontier: [root.id],
+    seen: [root.key],
   };
   if (isAccept(machine, symbols, root)) {
     root.outcome = "accept";
     return { ...engine, status: "accepted", message: "Accepted.", frontier: [] };
   }
-  return engine;
+  if (machine.kind !== "dfa") return engine;
+  const configs = [root];
+  const byId = new Map([[root.id, root]]);
+  const seen = new Set([root.key]);
+  const closed = closeEpsilon(machine, symbols, [root.id], configs, byId, transitionsFrom(machine), seen, 1);
+  if (configs.some((config) => config.outcome === "accept")) {
+    return { ...engine, configs, frontier: [], seen: [...seen], nextId: closed.nextId, status: "accepted", message: "Accepted." };
+  }
+  return { ...engine, configs, frontier: closed.frontier, seen: [...seen], nextId: closed.nextId };
 }
 
 export function stepEngine(engine: Engine, machine: Machine, symbols: string[]): Engine {
   if (engine.status !== "ready" || engine.frontier.length === 0) return finish(engine);
   const configs = engine.configs.map((config) => ({ ...config }));
   const byId = new Map(configs.map((config) => [config.id, config]));
+  const bySource = transitionsFrom(machine);
+  const seen = new Set(engine.seen);
   const nextFrontier: string[] = [];
   let nextId = engine.nextId;
   let limited = false;
   for (const id of engine.frontier) {
     const config = byId.get(id);
     if (!config || config.outcome !== "open") continue;
-    const moves = applicable(machine, symbols, config);
+    const moves = applicable(bySource.get(config.state) ?? [], machine, symbols, config).filter(
+      (transition) => machine.kind !== "dfa" || !isEpsilon(transition.read),
+    );
     if (moves.length === 0) {
       config.outcome = "reject";
       config.reason = "no transition";
@@ -173,22 +242,38 @@ export function stepEngine(engine: Engine, machine: Machine, symbols: string[]):
       }
       const child = apply(machine, config, transition, `c${nextId}`);
       nextId += 1;
-      if (pathHas(child, byId)) {
-        configs.push({ ...child, outcome: "loop", reason: "repeated configuration" });
+      if (seen.has(child.key)) {
+        if (pathHas(child, byId)) {
+          configs.push({ ...child, outcome: "loop", reason: "repeated configuration" });
+        }
         continue;
       }
+      seen.add(child.key);
       if (isAccept(machine, symbols, child)) {
         configs.push({ ...child, outcome: "accept", reason: "accepting state" });
         continue;
       }
       configs.push(child);
       byId.set(child.id, child);
-      nextFrontier.push(child.id);
+      if (machine.kind === "dfa") {
+        const closed = closeEpsilon(machine, symbols, [child.id], configs, byId, bySource, seen, nextId);
+        nextId = closed.nextId;
+        nextFrontier.push(...closed.frontier);
+      } else {
+        nextFrontier.push(child.id);
+      }
     }
     if (limited) break;
   }
   const steps = engine.steps + 1;
-  const next: Engine = { ...engine, configs, frontier: nextFrontier, steps, nextId };
+  const next: Engine = {
+    ...engine,
+    configs,
+    frontier: [...new Set(nextFrontier)],
+    steps,
+    nextId,
+    seen: [...seen],
+  };
   if (limited || steps >= STEP_CAP) {
     return {
       ...next,

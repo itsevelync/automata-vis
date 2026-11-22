@@ -7,534 +7,534 @@ import { useDiagram } from "../store/diagram";
 import { useRun } from "../store/run";
 
 export function RunPanel() {
-    const automataKind = useDiagram((state) => state.automataKind);
-    const nodes = useDiagram((state) => state.nodes);
-    const edges = useDiagram((state) => state.edges);
-    const input = useRun((state) => state.input);
-    const setInput = useRun((state) => state.setInput);
-    const speed = useRun((state) => state.speed);
-    const setSpeed = useRun((state) => state.setSpeed);
-    const status = useRun((state) => state.status);
-    const message = useRun((state) => state.message);
-    const symbols = useRun((state) => state.symbols);
-    const steps = useRun((state) => state.steps);
-    const configs = useRun((state) => state.configs);
-    const frontier = useRun((state) => state.frontier);
-    const load = useRun((state) => state.load);
-    const step = useRun((state) => state.step);
-    const skip = useRun((state) => state.skip);
-    const play = useRun((state) => state.play);
-    const pause = useRun((state) => state.pause);
-    const stop = useRun((state) => state.stop);
-    const reset = useRun((state) => state.reset);
-    const inputRef = useRef<HTMLInputElement>(null);
-    const [traceOpen, setTraceOpen] = useState(false);
-    const machine = useMemo(
-        () => compile(automataKind, nodes, edges),
-        [automataKind, nodes, edges],
-    );
-    const labels = useMemo(
-        () => new Map(nodes.map((node) => [node.id, node.label])),
-        [nodes],
-    );
+  const automataKind = useDiagram((state) => state.automataKind);
+  const nodes = useDiagram((state) => state.nodes);
+  const edges = useDiagram((state) => state.edges);
+  const input = useRun((state) => state.input);
+  const setInput = useRun((state) => state.setInput);
+  const speed = useRun((state) => state.speed);
+  const setSpeed = useRun((state) => state.setSpeed);
+  const status = useRun((state) => state.status);
+  const message = useRun((state) => state.message);
+  const symbols = useRun((state) => state.symbols);
+  const steps = useRun((state) => state.steps);
+  const configs = useRun((state) => state.configs);
+  const frontier = useRun((state) => state.frontier);
+  const load = useRun((state) => state.load);
+  const step = useRun((state) => state.step);
+  const skip = useRun((state) => state.skip);
+  const play = useRun((state) => state.play);
+  const pause = useRun((state) => state.pause);
+  const stop = useRun((state) => state.stop);
+  const reset = useRun((state) => state.reset);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [traceOpen, setTraceOpen] = useState(false);
+  const machine = useMemo(
+    () => compile(automataKind, nodes, edges),
+    [automataKind, nodes, edges],
+  );
+  const labels = useMemo(
+    () => new Map(nodes.map((node) => [node.id, node.label])),
+    [nodes],
+  );
 
-    useEffect(() => {
-        reset();
-    }, [automataKind, nodes, edges, reset]);
+  useEffect(() => {
+    reset();
+  }, [automataKind, nodes, edges, reset]);
 
-    useEffect(() => {
-        if (status !== "running") return;
-        const timer = window.setInterval(() => useRun.getState().step(), speed);
-        return () => window.clearInterval(timer);
-    }, [status, speed]);
+  useEffect(() => {
+    if (status !== "running") return;
+    const timer = window.setInterval(() => useRun.getState().step(), speed);
+    return () => window.clearInterval(timer);
+  }, [status, speed]);
 
-    const live = frontier
-        .map((id) => configs.find((config) => config.id === id))
-        .filter((config): config is SimConfig => Boolean(config));
-    const finished =
-        status === "accepted" || status === "rejected" || status === "limited";
-    const halted = configs.filter((config) => config.outcome !== "open");
+  const live = frontier
+    .map((id) => configs.find((config) => config.id === id))
+    .filter((config): config is SimConfig => Boolean(config));
+  const finished =
+    status === "accepted" || status === "rejected" || status === "limited";
+  const halted = configs.filter((config) => config.outcome !== "open");
 
-    return (
-        <section className="panel run-panel">
-            <h2>Run</h2>
-            {machine.errors.length ? (
-                <p className="error">{machine.errors.join(" ")}</p>
+  return (
+    <section className="panel run-panel">
+      <h2>Run</h2>
+      {machine.errors.length ? (
+        <p className="error">{machine.errors.join(" ")}</p>
+      ) : (
+        <>
+          <p className="muted">Load an input, then step or play.</p>
+          <label>
+            Input
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") load();
+              }}
+            />
+          </label>
+          <button
+            type="button"
+            onClick={load}
+            disabled={machine.errors.length > 0}
+          >
+            Load
+          </button>
+          <div className="run-controls">
+            <button
+              type="button"
+              onClick={play}
+              disabled={status !== "ready" && status !== "paused"}
+            >
+              Play
+            </button>
+            <button
+              type="button"
+              onClick={pause}
+              disabled={status !== "running"}
+            >
+              Pause
+            </button>
+            <button
+              type="button"
+              onClick={stop}
+              disabled={status === "idle"}
+            >
+              Stop
+            </button>
+            <button
+              type="button"
+              onClick={step}
+              disabled={status !== "ready" && status !== "paused"}
+            >
+              Step
+            </button>
+            <button
+              type="button"
+              onClick={skip}
+              disabled={
+                status !== "ready" &&
+                status !== "paused" &&
+                status !== "running"
+              }
+            >
+              Skip
+            </button>
+          </div>
+          <label>
+            Speed
+            <input
+              type="range"
+              min={50}
+              max={1000}
+              step={50}
+              value={speed}
+              onChange={(event) =>
+                setSpeed(Number(event.target.value))
+              }
+            />
+            <p className="muted">{speed} ms per step</p>
+          </label>
+          <p>
+            Steps <strong>{steps}</strong>
+          </p>
+          <p>
+            State{" "}
+            {live.length === 0 ? (
+              <span className="muted">none</span>
             ) : (
-                <>
-                    <p className="muted">Load an input, then step or play.</p>
-                    <label>
-                        Input
-                        <input
-                            ref={inputRef}
-                            value={input}
-                            onChange={(event) => setInput(event.target.value)}
-                            onKeyDown={(event) => {
-                                if (event.key === "Enter") load();
-                            }}
-                        />
-                    </label>
-                    <button
-                        type="button"
-                        onClick={load}
-                        disabled={machine.errors.length > 0}
-                    >
-                        Load
-                    </button>
-                    <div className="run-controls">
-                        <button
-                            type="button"
-                            onClick={play}
-                            disabled={status !== "ready" && status !== "paused"}
-                        >
-                            Play
-                        </button>
-                        <button
-                            type="button"
-                            onClick={pause}
-                            disabled={status !== "running"}
-                        >
-                            Pause
-                        </button>
-                        <button
-                            type="button"
-                            onClick={stop}
-                            disabled={status === "idle"}
-                        >
-                            Stop
-                        </button>
-                        <button
-                            type="button"
-                            onClick={step}
-                            disabled={status !== "ready" && status !== "paused"}
-                        >
-                            Step
-                        </button>
-                        <button
-                            type="button"
-                            onClick={skip}
-                            disabled={
-                                status !== "ready" &&
-                                status !== "paused" &&
-                                status !== "running"
-                            }
-                        >
-                            Skip
-                        </button>
-                    </div>
-                    <label>
-                        Speed
-                        <input
-                            type="range"
-                            min={50}
-                            max={1000}
-                            step={50}
-                            value={speed}
-                            onChange={(event) =>
-                                setSpeed(Number(event.target.value))
-                            }
-                        />
-                    </label>
-                    <p className="muted">{speed} ms per step</p>
-                    <p>
-                        Steps <strong>{steps}</strong>
-                    </p>
-                    <p>
-                        State{" "}
-                        {live.length === 0 ? (
-                            <span className="muted">none</span>
-                        ) : (
-                            live.map((config) => (
-                                <LatexLabel
-                                    key={config.id}
-                                    className="run-math"
-                                    label={
-                                        labels.get(config.state) ?? config.state
-                                    }
-                                />
-                            ))
-                        )}
-                    </p>
-                    {message ? (
-                        <p className={finished ? "run-result" : "muted"}>
-                            {message}
-                        </p>
-                    ) : null}
-                    {automataKind === "tm"
-                        ? live
-                              .slice(0, 4)
-                              .map((config) => (
-                                  <Tape
-                                      key={config.id}
-                                      config={config}
-                                      inputLength={symbols.length}
-                                  />
-                              ))
-                        : null}
-                    {automataKind === "pda"
-                        ? live
-                              .slice(0, 4)
-                              .map((config) => (
-                                  <StackView
-                                      key={config.id}
-                                      config={config}
-                                      symbols={symbols}
-                                  />
-                              ))
-                        : null}
-                    {automataKind === "dfa" && symbols.length > 0 && live[0] ? (
-                        <InputCursor
-                            symbols={symbols}
-                            cursor={live[0].cursor}
-                        />
-                    ) : null}
-                    {finished ? (
-                        <div className="run-summary">
-                            <button
-                                type="button"
-                                onClick={() => setTraceOpen(true)}
-                            >
-                                States visited
-                            </button>
-                            <p className="muted">
-                                {halted.length} halted branch
-                                {halted.length === 1 ? "" : "es"},{" "}
-                                {
-                                    configs.filter(
-                                        (config) => config.outcome === "loop",
-                                    ).length
-                                }{" "}
-                                loop
-                                {configs.filter(
-                                    (config) => config.outcome === "loop",
-                                ).length === 1
-                                    ? ""
-                                    : "s"}
-                                .
-                            </p>
-                            <Modal
-                                open={traceOpen}
-                                title="Decision tree"
-                                onClose={() => setTraceOpen(false)}
-                            >
-                                <Trace configs={configs} labels={labels} />
-                            </Modal>
-                            {automataKind === "tm"
-                                ? halted
-                                      .filter(
-                                          (config) =>
-                                              config.outcome === "accept" ||
-                                              halted.length === 1,
-                                      )
-                                      .slice(0, 3)
-                                      .map((config) => (
-                                          <Tape
-                                              key={`final-${config.id}`}
-                                              config={config}
-                                              inputLength={symbols.length}
-                                          />
-                                      ))
-                                : null}
-                            {automataKind === "pda"
-                                ? halted
-                                      .filter(
-                                          (config) =>
-                                              config.outcome === "accept" ||
-                                              halted.length === 1,
-                                      )
-                                      .slice(0, 3)
-                                      .map((config) => (
-                                          <StackView
-                                              key={`final-${config.id}`}
-                                              config={config}
-                                              symbols={symbols}
-                                          />
-                                      ))
-                                : null}
-                        </div>
-                    ) : null}
-                </>
+              live.map((config) => (
+                <LatexLabel
+                  key={config.id}
+                  className="run-math"
+                  label={
+                    labels.get(config.state) ?? config.state
+                  }
+                />
+              ))
             )}
-        </section>
-    );
+          </p>
+          {message ? (
+            <p className={finished ? "run-result" : "muted"}>
+              {message}
+            </p>
+          ) : null}
+          {automataKind === "tm"
+            ? live
+                .slice(0, 4)
+                .map((config) => (
+                  <Tape
+                    key={config.id}
+                    config={config}
+                    inputLength={symbols.length}
+                  />
+                ))
+            : null}
+          {automataKind === "pda"
+            ? live
+                .slice(0, 4)
+                .map((config) => (
+                  <StackView
+                    key={config.id}
+                    config={config}
+                    symbols={symbols}
+                  />
+                ))
+            : null}
+          {automataKind === "dfa" && symbols.length > 0 && live[0] ? (
+            <InputCursor
+              symbols={symbols}
+              cursor={live[0].cursor}
+            />
+          ) : null}
+          {finished ? (
+            <div className="run-summary">
+              <button
+                type="button"
+                onClick={() => setTraceOpen(true)}
+              >
+                States visited
+              </button>
+              <p className="muted">
+                {halted.length} halted branch
+                {halted.length === 1 ? "" : "es"},{" "}
+                {
+                  configs.filter(
+                    (config) => config.outcome === "loop",
+                  ).length
+                }{" "}
+                loop
+                {configs.filter(
+                  (config) => config.outcome === "loop",
+                ).length === 1
+                  ? ""
+                  : "s"}
+                .
+              </p>
+              <Modal
+                open={traceOpen}
+                title="Decision tree"
+                onClose={() => setTraceOpen(false)}
+              >
+                <Trace configs={configs} labels={labels} />
+              </Modal>
+              {automataKind === "tm"
+                ? halted
+                    .filter(
+                      (config) =>
+                        config.outcome === "accept" ||
+                        halted.length === 1,
+                    )
+                    .slice(0, 3)
+                    .map((config) => (
+                      <Tape
+                        key={`final-${config.id}`}
+                        config={config}
+                        inputLength={symbols.length}
+                      />
+                    ))
+                : null}
+              {automataKind === "pda"
+                ? halted
+                    .filter(
+                      (config) =>
+                        config.outcome === "accept" ||
+                        halted.length === 1,
+                    )
+                    .slice(0, 3)
+                    .map((config) => (
+                      <StackView
+                        key={`final-${config.id}`}
+                        config={config}
+                        symbols={symbols}
+                      />
+                    ))
+                : null}
+            </div>
+          ) : null}
+        </>
+      )}
+    </section>
+  );
 }
 
 function InputCursor({
-    symbols,
-    cursor,
+  symbols,
+  cursor,
 }: {
-    symbols: string[];
-    cursor: number;
+  symbols: string[];
+  cursor: number;
 }) {
-    return (
-        <p className="input-cursor" aria-label="Remaining input">
-            {symbols.map((symbol, index) => (
-                <span
-                    key={`${symbol}-${index}`}
-                    className={index === cursor ? "cursor" : undefined}
-                >
-                    <LatexLabel className="run-math" label={symbol} />
-                </span>
-            ))}
-            {cursor >= symbols.length ? <span className="cursor" /> : null}
-        </p>
-    );
+  return (
+    <p className="input-cursor" aria-label="Remaining input">
+      {symbols.map((symbol, index) => (
+        <span
+          key={`${symbol}-${index}`}
+          className={index === cursor ? "cursor" : undefined}
+        >
+          <LatexLabel className="run-math" label={symbol} />
+        </span>
+      ))}
+      {cursor >= symbols.length ? <span className="cursor" /> : null}
+    </p>
+  );
 }
 
 function Tape({
-    config,
-    inputLength,
+  config,
+  inputLength,
 }: {
-    config: SimConfig;
-    inputLength: number;
+  config: SimConfig;
+  inputLength: number;
 }) {
-    const tapeRef = useRef<HTMLDivElement>(null);
-    const headRef = useRef<HTMLSpanElement>(null);
-    const occupied = Object.keys(config.tape).map(Number);
-    const left = Math.min(
-        config.head,
-        ...(occupied.length ? occupied : [config.head]),
-    );
-    const right = Math.max(
-        config.head,
-        ...(occupied.length ? occupied : [config.head]),
-    );
-    const extra = inputLength < 10 ? 10 - inputLength : 0;
-    const leftPad = Math.max(1, Math.floor(extra / 2));
-    const rightPad = Math.max(1, extra - Math.floor(extra / 2));
-    const cells = [];
-    for (let index = left - leftPad; index <= right + rightPad; index += 1)
-        cells.push(index);
-    useLayoutEffect(() => {
-        const tape = tapeRef.current;
-        const head = headRef.current;
-        if (!tape || !head) return;
-        const tapeRect = tape.getBoundingClientRect();
-        const headRect = head.getBoundingClientRect();
-        const headCenter = headRect.left + headRect.width / 2;
-        const viewCenter = tapeRect.left + tape.clientWidth / 2;
-        tape.scrollLeft += headCenter - viewCenter;
-    }, [config.head, cells.length]);
-    return (
-        <div className="tape" aria-label="Tape" ref={tapeRef}>
-            <span className="tape-ellipsis">...</span>
-            {cells.map((index) => (
-                <span
-                    key={index}
-                    ref={index === config.head ? headRef : undefined}
-                    className={
-                        index === config.head ? "tape-cell head" : "tape-cell"
-                    }
-                >
-                    <LatexLabel
-                        className="run-math"
-                        label={config.tape[index] ?? BLANK}
-                    />
-                </span>
-            ))}
-            <span className="tape-ellipsis">...</span>
-        </div>
-    );
+  const tapeRef = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLSpanElement>(null);
+  const occupied = Object.keys(config.tape).map(Number);
+  const left = Math.min(
+    config.head,
+    ...(occupied.length ? occupied : [config.head]),
+  );
+  const right = Math.max(
+    config.head,
+    ...(occupied.length ? occupied : [config.head]),
+  );
+  const extra = inputLength < 10 ? 10 - inputLength : 0;
+  const leftPad = Math.max(1, Math.floor(extra / 2));
+  const rightPad = Math.max(1, extra - Math.floor(extra / 2));
+  const cells = [];
+  for (let index = left - leftPad; index <= right + rightPad; index += 1)
+    cells.push(index);
+  useLayoutEffect(() => {
+    const tape = tapeRef.current;
+    const head = headRef.current;
+    if (!tape || !head) return;
+    const tapeRect = tape.getBoundingClientRect();
+    const headRect = head.getBoundingClientRect();
+    const headCenter = headRect.left + headRect.width / 2;
+    const viewCenter = tapeRect.left + tape.clientWidth / 2;
+    tape.scrollLeft += headCenter - viewCenter;
+  }, [config.head, cells.length]);
+  return (
+    <div className="tape" aria-label="Tape" ref={tapeRef}>
+      <span className="tape-ellipsis">...</span>
+      {cells.map((index) => (
+        <span
+          key={index}
+          ref={index === config.head ? headRef : undefined}
+          className={
+            index === config.head ? "tape-cell head" : "tape-cell"
+          }
+        >
+          <LatexLabel
+            className="run-math"
+            label={config.tape[index] ?? BLANK}
+          />
+        </span>
+      ))}
+      <span className="tape-ellipsis">...</span>
+    </div>
+  );
 }
 
 function StackView({
-    config,
-    symbols,
+  config,
+  symbols,
 }: {
-    config: SimConfig;
-    symbols: string[];
+  config: SimConfig;
+  symbols: string[];
 }) {
-    return (
-        <div>
-            <InputCursor symbols={symbols} cursor={config.cursor} />
-            <p className="muted">Stack, top at the right</p>
-            <p className="stack">
-                {config.stack.length === 0 ? (
-                    <span className="muted">empty</span>
-                ) : (
-                    config.stack.map((symbol, index) => (
-                        <LatexLabel
-                            key={`${symbol}-${index}`}
-                            className="run-math"
-                            label={symbol}
-                        />
-                    ))
-                )}
-            </p>
-        </div>
-    );
+  return (
+    <div>
+      <InputCursor symbols={symbols} cursor={config.cursor} />
+      <p className="muted">Stack, top at the right</p>
+      <p className="stack">
+        {config.stack.length === 0 ? (
+          <span className="muted">empty</span>
+        ) : (
+          config.stack.map((symbol, index) => (
+            <LatexLabel
+              key={`${symbol}-${index}`}
+              className="run-math"
+              label={symbol}
+            />
+          ))
+        )}
+      </p>
+    </div>
+  );
 }
 
 function Trace({
-    configs,
-    labels,
+  configs,
+  labels,
 }: {
-    configs: SimConfig[];
-    labels: Map<string, string>;
+  configs: SimConfig[];
+  labels: Map<string, string>;
 }) {
-    const displaySizes = useDiagram((state) => state.displaySizes);
-    const nodeSize = useDiagram((state) => state.nodeSize);
-    const radiusOf = (state: string) => (displaySizes[state] ?? nodeSize) / 2;
-    const byId = new Map(configs.map((config) => [config.id, config]));
-    const levels = new Map<number, Map<string, SimConfig["outcome"]>>();
-    for (const config of configs) {
-        const row = levels.get(config.steps) ?? new Map();
-        const current = row.get(config.state);
-        row.set(config.state, betterOutcome(current, config.outcome));
-        levels.set(config.steps, row);
-    }
-    const steps = [...levels.keys()].sort((left, right) => left - right);
-    const rows = steps.map((step) => [...(levels.get(step)?.entries() ?? [])]);
-    const links: { from: string; to: string }[] = [];
-    const seen = new Set<string>();
-    for (const config of configs) {
-        if (!config.parentId) continue;
-        const parent = byId.get(config.parentId);
-        if (!parent) continue;
-        const key = `${parent.steps}:${parent.state}:${config.steps}:${config.state}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        links.push({
-            from: `${parent.steps}:${parent.state}`,
-            to: `${config.steps}:${config.state}`,
-        });
-    }
-    const gapX = 22;
-    const gapY = 28;
-    const pad = 8;
-    const rowWidths = rows.map(
-        (row) =>
-            row.reduce((sum, [state]) => sum + radiusOf(state) * 2, 0) +
-            gapX * Math.max(0, row.length - 1),
-    );
-    const width = pad * 2 + Math.max(1, ...rowWidths);
-    const position = new Map<string, { x: number; y: number; r: number }>();
-    let cursorY = pad;
-    rows.forEach((row, level) => {
-        const radii = row.map(([state]) => radiusOf(state));
-        const maxR = Math.max(radiusOf(""), ...radii);
-        cursorY += maxR;
-        let cursorX = (width - rowWidths[level]) / 2;
-        row.forEach(([state], index) => {
-            const r = radii[index];
-            cursorX += r;
-            position.set(`${steps[level]}:${state}`, {
-                x: cursorX,
-                y: cursorY,
-                r,
-            });
-            cursorX += r + gapX;
-        });
-        cursorY += maxR + gapY;
+  const displaySizes = useDiagram((state) => state.displaySizes);
+  const nodeSize = useDiagram((state) => state.nodeSize);
+  const radiusOf = (state: string) => (displaySizes[state] ?? nodeSize) / 2;
+  const byId = new Map(configs.map((config) => [config.id, config]));
+  const levels = new Map<number, Map<string, SimConfig["outcome"]>>();
+  for (const config of configs) {
+    const row = levels.get(config.steps) ?? new Map();
+    const current = row.get(config.state);
+    row.set(config.state, betterOutcome(current, config.outcome));
+    levels.set(config.steps, row);
+  }
+  const steps = [...levels.keys()].sort((left, right) => left - right);
+  const rows = steps.map((step) => [...(levels.get(step)?.entries() ?? [])]);
+  const links: { from: string; to: string }[] = [];
+  const seen = new Set<string>();
+  for (const config of configs) {
+    if (!config.parentId) continue;
+    const parent = byId.get(config.parentId);
+    if (!parent) continue;
+    const key = `${parent.steps}:${parent.state}:${config.steps}:${config.state}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    links.push({
+      from: `${parent.steps}:${parent.state}`,
+      to: `${config.steps}:${config.state}`,
     });
-    const height = Math.max(pad * 2, cursorY - gapY + pad);
-    return (
-        <svg
-            className="level-tree"
-            width={width}
-            viewBox={`0 0 ${width} ${height}`}
-            role="img"
-            aria-label="Decision tree"
-        >
-            {links.map((link) => {
-                const start = position.get(link.from);
-                const end = position.get(link.to);
-                if (!start || !end) return null;
-                const segment = shorten(
-                    start.x,
-                    start.y,
-                    start.r + 1,
-                    end.x,
-                    end.y,
-                    end.r + 1,
-                );
-                return (
-                    <line
-                        key={`${link.from}-${link.to}`}
-                        x1={segment.x1}
-                        y1={segment.y1}
-                        x2={segment.x2}
-                        y2={segment.y2}
-                        stroke="#000000"
-                        strokeWidth={1}
-                    />
-                );
-            })}
-            {rows.flatMap((row, level) =>
-                row.map(([state, outcome]) => {
-                    const point = position.get(`${steps[level]}:${state}`);
-                    if (!point) return null;
-                    const label = labels.get(state) ?? state;
-                    return (
-                        <g key={`${steps[level]}:${state}`}>
-                            <circle
-                                cx={point.x}
-                                cy={point.y}
-                                r={point.r}
-                                fill="#ffffff"
-                                stroke="#000000"
-                                strokeWidth={outcome === "accept" ? 2.4 : 1}
-                                strokeDasharray={
-                                    outcome === "reject" || outcome === "loop"
-                                        ? "3 2"
-                                        : undefined
-                                }
-                            />
-                            {outcome === "accept" ? (
-                                <circle
-                                    cx={point.x}
-                                    cy={point.y}
-                                    r={point.r - 4}
-                                    fill="none"
-                                    stroke="#000000"
-                                    strokeWidth={1}
-                                />
-                            ) : null}
-                            <foreignObject
-                                x={point.x - point.r}
-                                y={point.y - point.r}
-                                width={point.r * 2}
-                                height={point.r * 2}
-                            >
-                                <div className="level-label">
-                                    <LatexLabel
-                                        className="state-token"
-                                        label={label}
-                                    />
-                                </div>
-                            </foreignObject>
-                        </g>
-                    );
-                }),
-            )}
-        </svg>
-    );
+  }
+  const gapX = 22;
+  const gapY = 28;
+  const pad = 8;
+  const rowWidths = rows.map(
+    (row) =>
+      row.reduce((sum, [state]) => sum + radiusOf(state) * 2, 0) +
+      gapX * Math.max(0, row.length - 1),
+  );
+  const width = pad * 2 + Math.max(1, ...rowWidths);
+  const position = new Map<string, { x: number; y: number; r: number }>();
+  let cursorY = pad;
+  rows.forEach((row, level) => {
+    const radii = row.map(([state]) => radiusOf(state));
+    const maxR = Math.max(radiusOf(""), ...radii);
+    cursorY += maxR;
+    let cursorX = (width - rowWidths[level]) / 2;
+    row.forEach(([state], index) => {
+      const r = radii[index];
+      cursorX += r;
+      position.set(`${steps[level]}:${state}`, {
+        x: cursorX,
+        y: cursorY,
+        r,
+      });
+      cursorX += r + gapX;
+    });
+    cursorY += maxR + gapY;
+  });
+  const height = Math.max(pad * 2, cursorY - gapY + pad);
+  return (
+    <svg
+      className="level-tree"
+      width={width}
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label="Decision tree"
+    >
+      {links.map((link) => {
+        const start = position.get(link.from);
+        const end = position.get(link.to);
+        if (!start || !end) return null;
+        const segment = shorten(
+          start.x,
+          start.y,
+          start.r + 1,
+          end.x,
+          end.y,
+          end.r + 1,
+        );
+        return (
+          <line
+            key={`${link.from}-${link.to}`}
+            x1={segment.x1}
+            y1={segment.y1}
+            x2={segment.x2}
+            y2={segment.y2}
+            stroke="#000000"
+            strokeWidth={1}
+          />
+        );
+      })}
+      {rows.flatMap((row, level) =>
+        row.map(([state, outcome]) => {
+          const point = position.get(`${steps[level]}:${state}`);
+          if (!point) return null;
+          const label = labels.get(state) ?? state;
+          return (
+            <g key={`${steps[level]}:${state}`}>
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r={point.r}
+                fill="#ffffff"
+                stroke="#000000"
+                strokeWidth={outcome === "accept" ? 2.4 : 1}
+                strokeDasharray={
+                  outcome === "reject" || outcome === "loop"
+                    ? "3 2"
+                    : undefined
+                }
+              />
+              {outcome === "accept" ? (
+                <circle
+                  cx={point.x}
+                  cy={point.y}
+                  r={point.r - 4}
+                  fill="none"
+                  stroke="#000000"
+                  strokeWidth={1}
+                />
+              ) : null}
+              <foreignObject
+                x={point.x - point.r}
+                y={point.y - point.r}
+                width={point.r * 2}
+                height={point.r * 2}
+              >
+                <div className="level-label">
+                  <LatexLabel
+                    className="state-token"
+                    label={label}
+                  />
+                </div>
+              </foreignObject>
+            </g>
+          );
+        }),
+      )}
+    </svg>
+  );
 }
 
 function betterOutcome(
-    current: SimConfig["outcome"] | undefined,
-    next: SimConfig["outcome"],
+  current: SimConfig["outcome"] | undefined,
+  next: SimConfig["outcome"],
 ): SimConfig["outcome"] {
-    const rank = { accept: 3, open: 2, reject: 1, loop: 0 };
-    if (!current || rank[next] > rank[current]) return next;
-    return current;
+  const rank = { accept: 3, open: 2, reject: 1, loop: 0 };
+  if (!current || rank[next] > rank[current]) return next;
+  return current;
 }
 
 function shorten(
-    x1: number,
-    y1: number,
-    r1: number,
-    x2: number,
-    y2: number,
-    r2: number,
+  x1: number,
+  y1: number,
+  r1: number,
+  x2: number,
+  y2: number,
+  r2: number,
 ) {
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const length = Math.hypot(dx, dy) || 1;
-    return {
-        x1: x1 + (dx / length) * r1,
-        y1: y1 + (dy / length) * r1,
-        x2: x2 - (dx / length) * r2,
-        y2: y2 - (dy / length) * r2,
-    };
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const length = Math.hypot(dx, dy) || 1;
+  return {
+    x1: x1 + (dx / length) * r1,
+    y1: y1 + (dy / length) * r1,
+    x2: x2 - (dx / length) * r2,
+    y2: y2 - (dy / length) * r2,
+  };
 }

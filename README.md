@@ -1,6 +1,6 @@
 # Automata Visualizer
 
-A small draw.io-like editor for automata state diagrams. It is for constructing DFAs, NFAs, PDAs, and Turing-machine pictures, not a general diagram tool and not a simulator (though a simulator may be coming soon!).
+A small draw.io-like editor for automata state diagrams, with a Run mode that steps a DFA/NFA, PDA, or Turing machine on an input. It is for constructing and simulating those automata, not a general diagram tool.
 
 The editor snaps states to a grid and exports the shortest TikZ that still matches that grid. Placement is relative, using the positioning library (`right=of`, `left=of`, `above=of`, `below=of`). The grid step is `node distance`, measured center to center because `on grid` is on.
 

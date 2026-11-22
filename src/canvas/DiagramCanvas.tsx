@@ -4,6 +4,8 @@ import { ExportPanel } from "../components/ExportPanel";
 import { Modal } from "../components/Modal";
 import { parseLength } from "../model/length";
 import { useDiagram } from "../store/diagram";
+import { useRun } from "../store/run";
+import { useSession } from "../store/session";
 import { EDGE_STROKE, EdgeLabel, buildEdgeCurve } from "./AutomataEdge";
 import { PT_PX, cellSizePx, centerToCell } from "./geometry";
 import { StateNode } from "./StateNode";
@@ -25,6 +27,10 @@ export function DiagramCanvas() {
   const select = useDiagram((state) => state.select);
   const loadExample = useDiagram((state) => state.loadExample);
   const clear = useDiagram((state) => state.clear);
+  const mode = useSession((state) => state.mode);
+  const activeStates = useRun((state) => state.activeStates);
+  const activeEdges = useRun((state) => state.activeEdges);
+  const running = mode === "run";
   const wrapRef = useRef<HTMLDivElement>(null);
   const drag = useRef<
     | { kind: "pan"; x: number; y: number; originX: number; originY: number }
@@ -87,6 +93,7 @@ export function DiagramCanvas() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      if (useSession.getState().mode === "run") return;
       if (event.key !== "Backspace" && event.key !== "Delete") return;
       const target = event.target as HTMLElement;
       if (target.closest("input, textarea, select")) return;
@@ -150,13 +157,14 @@ export function DiagramCanvas() {
 
   function onNodePointerDown(event: React.PointerEvent, id: string) {
     event.stopPropagation();
-    if (event.shiftKey) return;
+    if (useSession.getState().mode === "run" || event.shiftKey) return;
     drag.current = { kind: "node", id };
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
   function onNodeClick(event: React.MouseEvent, id: string) {
     event.stopPropagation();
+    if (useSession.getState().mode === "run") return;
     const current = useDiagram.getState().selection;
     if (event.shiftKey && current?.kind === "node") {
       addEdge(current.id, id, false);
@@ -166,6 +174,7 @@ export function DiagramCanvas() {
   }
 
   function onDoubleClick(event: React.MouseEvent) {
+    if (useSession.getState().mode === "run") return;
     if ((event.target as HTMLElement).closest(".state-node, .toolbar, .canvas-controls")) return;
     const point = flowPoint(event.clientX, event.clientY);
     const cell = centerToCell(point.x, point.y, cellPx);
@@ -217,7 +226,7 @@ export function DiagramCanvas() {
 
   return (
     <div
-      className={panning ? "canvas-wrap panning" : "canvas-wrap"}
+      className={panning ? "canvas-wrap panning" : running ? "canvas-wrap running" : "canvas-wrap"}
       ref={wrapRef}
       onPointerDown={onPointerDown}
       onDoubleClick={onDoubleClick}
@@ -227,27 +236,31 @@ export function DiagramCanvas() {
       }}
     >
       <div className="toolbar">
-        <button
-          type="button"
-          onClick={() => {
-            loadExample();
-            window.setTimeout(() => fit(useDiagram.getState().nodes), 0);
-          }}
-        >
-          Load example
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            clear();
-            setView({ x: 48, y: 48, zoom: 1 });
-          }}
-        >
-          Clear
-        </button>
-        <button type="button" onClick={() => setModal("defaults")}>
-          Defaults
-        </button>
+        {running ? null : (
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                loadExample();
+                window.setTimeout(() => fit(useDiagram.getState().nodes), 0);
+              }}
+            >
+              Load example
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                clear();
+                setView({ x: 48, y: 48, zoom: 1 });
+              }}
+            >
+              Clear
+            </button>
+            <button type="button" onClick={() => setModal("defaults")}>
+              Defaults
+            </button>
+          </>
+        )}
         <button type="button" onClick={() => setModal("help")}>
           Help
         </button>
@@ -268,6 +281,7 @@ export function DiagramCanvas() {
           <li>Add label adds another line. Only extra lines can be deleted. Two or more lines become a centered array.</li>
           <li>The symbol buttons insert \varepsilon, \to, and \textvisiblespace.</li>
           <li>Swap reverses an edge.</li>
+          <li>Run steps the diagram on an input. Build is read-only while running.</li>
         </ul>
       </Modal>
       <Modal open={modal === "defaults"} title="Defaults" onClose={() => setModal(null)}>
@@ -330,7 +344,8 @@ export function DiagramCanvas() {
             if (!source || !target) return null;
             const built = buildEdgeCurve(edge, source, target);
             if (!built) return null;
-            const selected = selection?.kind === "edge" && selection.id === edge.id;
+            const selected = !running && selection?.kind === "edge" && selection.id === edge.id;
+            const active = running && activeEdges.includes(edge.id);
             return (
               <g key={edge.id}>
                 <path
@@ -339,14 +354,15 @@ export function DiagramCanvas() {
                   onPointerDown={(event) => event.stopPropagation()}
                   onClick={(event) => {
                     event.stopPropagation();
+                    if (useSession.getState().mode === "run") return;
                     select({ kind: "edge", id: edge.id });
                   }}
                 />
                 <path
                   d={curvePath(built.curve, built.straight)}
                   className="edge-path"
-                  markerEnd={selected ? "url(#automata-stealth-selected)" : "url(#automata-stealth)"}
-                  stroke={selected ? "#9a3412" : "#000000"}
+                  markerEnd={active || selected ? "url(#automata-stealth-selected)" : "url(#automata-stealth)"}
+                  stroke={active ? "#1d4ed8" : selected ? "#9a3412" : "#000000"}
                   strokeWidth={EDGE_STROKE}
                 />
               </g>
@@ -364,8 +380,11 @@ export function DiagramCanvas() {
               key={edge.id}
               edge={edge}
               curve={built.curve}
-              selected={selection?.kind === "edge" && selection.id === edge.id}
-              onSelect={() => select({ kind: "edge", id: edge.id })}
+              selected={!running && selection?.kind === "edge" && selection.id === edge.id}
+              onSelect={() => {
+                if (useSession.getState().mode === "run") return;
+                select({ kind: "edge", id: edge.id });
+              }}
             />
           );
         })}
@@ -382,12 +401,15 @@ export function DiagramCanvas() {
               label={node.label}
               initial={node.initial}
               accepting={node.accepting}
-              selected={selection?.kind === "node" && selection.id === node.id}
+              selected={!running && selection?.kind === "node" && selection.id === node.id}
+              active={running && activeStates.includes(node.id)}
             />
           </div>
         ))}
       </div>
-      {nodes.length === 0 ? <p className="canvas-hint">Double-click to add a state.</p> : null}
+      {nodes.length === 0 ? (
+        <p className="canvas-hint">{running ? "Switch to Build to add states." : "Double-click to add a state."}</p>
+      ) : null}
     </div>
   );
 }

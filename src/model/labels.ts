@@ -18,6 +18,25 @@ export function displayEdgeLabel(lines: string[], kind: AutomataKind): string {
   return joinLabels(lines.map((line) => renderEdgeLine(line, kind)));
 }
 
+export function transitionText(
+  lines: string[] | undefined,
+  label: string | undefined,
+  kind: AutomataKind,
+): string[] {
+  const raw = lines && lines.length > 0 ? lines : splitLabelLines(label ?? "");
+  return raw.map((line) => renderEdgeLine(line, kind));
+}
+
+function splitLabelLines(label: string): string[] {
+  const source = label.trim().replace(/^\$/, "").replace(/\$$/, "").trim();
+  const match = source.match(/^\\begin\{array\}\{c\}([\s\S]*)\\end\{array\}$/);
+  if (!match) return [source];
+  return match[1]
+    .split("\\\\")
+    .map((line) => line.trim())
+    .filter((line) => line !== "");
+}
+
 function renderEdgeLine(line: string, kind: AutomataKind): string {
   if (kind === "dfa") return line === "" ? EPSILON : line;
   const parts = splitTransition(line, kind).map((part, index) => {

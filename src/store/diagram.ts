@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { motivatingDiagram } from "../example";
+import { exampleFor } from "../example";
 import { isValidId, nextStateId } from "../model/ids";
 import { DEFAULT_STATE_NODE_SIZE } from "../canvas/geometry";
 import { displayEdgeLabel } from "../model/labels";
@@ -178,13 +178,18 @@ export const useDiagram = create<DiagramState>((set, get) => ({
   select: (selection) => set({ selection }),
   setAutomataKind: (automataKind) => set({ automataKind }),
   loadExample: () => {
+    const example = exampleFor(get().automataKind);
     set({
-      nodes: motivatingDiagram.nodes.map((node) => ({ ...node })),
-      edges: motivatingDiagram.edges.map((edge) => ({ ...edge })),
-      nodeDistance: motivatingDiagram.defaults.nodeDistance,
-      scale: motivatingDiagram.defaults.scale,
+      nodes: example.nodes.map((node) => ({ ...node })),
+      edges: example.edges.map((edge) => ({
+        ...edge,
+        ...(edge.lines ? { lines: [...edge.lines] } : {}),
+        ...(edge.labelPos ? { labelPos: { ...edge.labelPos } } : {}),
+      })),
+      nodeDistance: example.defaults.nodeDistance,
+      scale: example.defaults.scale,
       selection: null,
-      edgeSeq: motivatingDiagram.edges.length + 1,
+      edgeSeq: example.edges.length + 1,
       displaySizes: {},
     });
   },

@@ -1,8 +1,47 @@
 import { joinLabels } from "./model/labels";
-import type { Diagram } from "./model/types";
+import type { AutomataKind, Diagram } from "./model/types";
+
+const defaults = { nodeDistance: "3cm", scale: 1 };
+
+export const dfaDiagram: Diagram = {
+  defaults,
+  nodes: [
+    { id: "q0", label: "q_0", col: 0, row: 0, initial: true },
+    { id: "q1", label: "q_1", col: 1, row: 0 },
+    { id: "q2", label: "q_2", col: 2, row: 0 },
+    { id: "q3", label: "q_{3}", col: 3, row: 0, accepting: true },
+  ],
+  edges: [
+    { id: "e1", source: "q0", target: "q0", label: "0", loop: "above" },
+    { id: "e2", source: "q0", target: "q1", label: "1" },
+    { id: "e3", source: "q1", target: "q1", label: "1", loop: "above" },
+    { id: "e4", source: "q1", target: "q2", label: "0", labelPos: { side: "above", distance: "0.01cm" } },
+    { id: "e5", source: "q2", target: "q0", label: "0", bend: "left" },
+    { id: "e6", source: "q2", target: "q3", label: "1", labelPos: { side: "above", distance: "0.01cm" } },
+    { id: "e7", source: "q3", target: "q1", label: "1", bend: "right", labelPos: { side: "above" } },
+    { id: "e8", source: "q3", target: "q2", label: "0", bend: "left" },
+  ],
+};
+
+export const pdaDiagram: Diagram = {
+  defaults,
+  nodes: [
+    { id: "q0", label: "q_0", col: 0, row: 0, initial: true },
+    { id: "q1", label: "q_1", col: 1, row: 0 },
+    { id: "q2", label: "q_2", col: 2, row: 0 },
+    { id: "q3", label: "q_3", col: 3, row: 0, accepting: true },
+  ],
+  edges: [
+    { id: "e1", source: "q0", target: "q1", label: "\\varepsilon,\\varepsilon\\to Z" },
+    { id: "e2", source: "q2", target: "q2", label: "1,0\\to\\varepsilon", loop: "below" },
+    { id: "e3", source: "q1", target: "q1", label: "0,\\varepsilon\\to 0", loop: "below" },
+    { id: "e4", source: "q1", target: "q2", label: "\\varepsilon,\\varepsilon\\to\\varepsilon" },
+    { id: "e5", source: "q2", target: "q3", label: "\\varepsilon,Z\\to\\varepsilon" },
+  ],
+};
 
 export const motivatingDiagram: Diagram = {
-  defaults: { nodeDistance: "3cm", scale: 1 },
+  defaults,
   nodes: [
     { id: "qa", label: "q_\\text{accept}", col: 0, row: 0, accepting: true },
     { id: "q1", label: "q_1", col: 0, row: 1 },
@@ -91,3 +130,9 @@ export const motivatingDiagram: Diagram = {
     },
   ],
 };
+
+export function exampleFor(kind: AutomataKind): Diagram {
+  if (kind === "pda") return pdaDiagram;
+  if (kind === "dfa") return dfaDiagram;
+  return motivatingDiagram;
+}

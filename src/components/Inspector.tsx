@@ -26,7 +26,7 @@ export function Inspector() {
   if (!selection) {
     return (
       <section className="panel">
-        <h2>Selection</h2>
+        <h2>Build</h2>
         <p className="muted">Select a state or edge.</p>
       </section>
     );

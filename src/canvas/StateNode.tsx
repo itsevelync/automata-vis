@@ -23,12 +23,14 @@ export function StateNode({
   initial,
   accepting,
   selected,
+  active = false,
 }: {
   id: string;
   label: string;
   initial?: boolean;
   accepting?: boolean;
   selected: boolean;
+  active?: boolean;
 }) {
   const minSize = useDiagram((state) => state.nodeSize);
   const size = useDiagram((state) => state.displaySizes[id] ?? minSize);
@@ -52,7 +54,7 @@ export function StateNode({
     };
   }, [label, id, minSize, setDisplaySize, size]);
 
-  const classes = ["state-node", accepting ? "accepting" : "", selected ? "selected" : ""]
+  const classes = ["state-node", accepting ? "accepting" : "", selected ? "selected" : "", active ? "active" : ""]
     .filter(Boolean)
     .join(" ");
   return (

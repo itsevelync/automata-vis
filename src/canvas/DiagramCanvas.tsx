@@ -379,13 +379,13 @@ export function DiagramCanvas() {
         <ExportPanel />
       </Modal>
       <div className="canvas-controls">
-        <button type="button" onClick={() => zoomBy(1.15)}>
+        <button type="button" title="Zoom in" onClick={() => zoomBy(1.15)}>
           <MdAdd />
         </button>
-        <button type="button" onClick={() => zoomBy(1 / 1.15)}>
+        <button type="button" title="Zoom out" onClick={() => zoomBy(1 / 1.15)}>
           <MdRemove />
         </button>
-        <button type="button" onClick={() => fit()}>
+        <button type="button" title="Fit" onClick={() => fit()}>
           <MdHome />
         </button>
       </div>
@@ -419,6 +419,18 @@ export function DiagramCanvas() {
             >
               <path d="M0 0 L12 5 L0 10 L3.2 5 Z" fill="#9a3412" />
             </marker>
+            <marker
+              id="automata-stealth-active"
+              viewBox="0 0 12 10"
+              markerWidth={5 * PT_PX}
+              markerHeight={4 * PT_PX}
+              markerUnits="userSpaceOnUse"
+              refX="11"
+              refY="5"
+              orient="auto"
+            >
+              <path d="M0 0 L12 5 L0 10 L3.2 5 Z" fill="#1d4ed8" />
+            </marker>
           </defs>
           {grid.vertical.map((x) => (
             <line key={`v${x}`} x1={x} y1={grid.top} x2={x} y2={grid.bottom} className="grid-line" />
@@ -449,7 +461,13 @@ export function DiagramCanvas() {
                 <path
                   d={curvePath(built.curve, built.straight)}
                   className="edge-path"
-                  markerEnd={active || selected ? "url(#automata-stealth-selected)" : "url(#automata-stealth)"}
+                  markerEnd={
+                    active
+                      ? "url(#automata-stealth-active)"
+                      : selected
+                        ? "url(#automata-stealth-selected)"
+                        : "url(#automata-stealth)"
+                  }
                   stroke={active ? "#1d4ed8" : selected ? "#9a3412" : "#000000"}
                   strokeWidth={EDGE_STROKE}
                 />

@@ -383,6 +383,7 @@ aside {
   flex-direction: row;
   align-items: center;
   gap: 1rem;
+  padding: 0.35rem 0;
 }
 
 .run-math {
@@ -503,6 +504,14 @@ aside {
   border: 1px solid #0000002b;
   background: #00000005;
   padding: 0.35rem 0.45rem;
+}
+
+.panel input[type="range"] {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
 }
 
 .check {

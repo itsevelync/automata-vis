@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dfaDiagram, div3Diagram, pdaDiagram } from "../example";
+import { dfaDiagram, div3Diagram, nfaEnds101Diagram, pdaDiagram } from "../example";
 import type { DiagramEdge, DiagramNode } from "../model/types";
 import { compile, tokenize } from "./compile";
 import { createEngine, stepEngine } from "./step";
@@ -116,6 +116,9 @@ describe("simulator", () => {
     expect(run("dfa", dfaDiagram.nodes, dfaDiagram.edges, "11").status).toBe("rejected");
     expect(run("dfa", div3Diagram.nodes, div3Diagram.edges, "110").status).toBe("accepted");
     expect(run("dfa", div3Diagram.nodes, div3Diagram.edges, "1").status).toBe("rejected");
+    expect(run("dfa", nfaEnds101Diagram.nodes, nfaEnds101Diagram.edges, "101").status).toBe("accepted");
+    expect(run("dfa", nfaEnds101Diagram.nodes, nfaEnds101Diagram.edges, "101").steps).toBe(3);
+    expect(run("dfa", nfaEnds101Diagram.nodes, nfaEnds101Diagram.edges, "100").status).toBe("rejected");
     expect(run("pda", pdaDiagram.nodes, pdaDiagram.edges, "").status).toBe("accepted");
     expect(run("pda", pdaDiagram.nodes, pdaDiagram.edges, "0011").status).toBe("accepted");
     expect(run("pda", pdaDiagram.nodes, pdaDiagram.edges, "001").status).toBe("rejected");

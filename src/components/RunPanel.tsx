@@ -101,6 +101,12 @@ export function RunPanel() {
             <div className="run-controls">
               <button
                 type="button"
+                onClick={stop}
+              >
+                Reset
+              </button>
+              <button
+                type="button"
                 onClick={back}
                 disabled={history.length === 0 || status === "running"}
               >
@@ -109,7 +115,7 @@ export function RunPanel() {
               <button
                 type="button"
                 onClick={play}
-                disabled={status !== "ready" && status !== "paused"}
+                disabled={status !== "ready" && status !== "paused" && !finished}
               >
                 <MdPlayArrow />
               </button>
@@ -129,12 +135,6 @@ export function RunPanel() {
               </button>
               <button
                 type="button"
-                onClick={stop}
-              >
-                Reset
-              </button>
-              <button
-                type="button"
                 onClick={skip}
                 disabled={
                   status !== "ready" &&
@@ -145,6 +145,9 @@ export function RunPanel() {
                 Skip
               </button>
             </div>
+            <div className="run-controls">
+              
+            </div>
             <label className="speed-control">
               Speed
               <input
@@ -152,10 +155,10 @@ export function RunPanel() {
                 min={50}
                 max={1000}
                 step={50}
-                value={speed}
+                value={1050 - speed}
                 style={{flexGrow: 1}}
                 onChange={(event) =>
-                  setSpeed(Number(event.target.value))
+                  setSpeed(1050 - Number(event.target.value))
                 }
               />
             </label>
@@ -181,11 +184,6 @@ export function RunPanel() {
             )}
           </p>
           </>
-          ) : null}
-          {message ? (
-            <p className={finished ? "run-result" : "muted"}>
-              {message}
-            </p>
           ) : null}
           {automataKind === "tm"
             ? live
@@ -214,6 +212,11 @@ export function RunPanel() {
               symbols={symbols}
               cursor={live[0].cursor}
             />
+          ) : null}
+          {message ? (
+            <p className={finished ? "run-result" : "muted"}>
+              {message}
+            </p>
           ) : null}
           {finished ? (
             <div className="run-summary">

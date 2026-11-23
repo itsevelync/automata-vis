@@ -33,10 +33,13 @@ interface RunState {
 
 function view(engine: Engine) {
   const frontier = new Set(engine.frontier);
+  for (const config of engine.configs) {
+    if (config.outcome === "accept" && config.steps === engine.steps) frontier.add(config.id);
+  }
   const active = engine.configs.filter((config) => frontier.has(config.id));
   return {
     configs: engine.configs,
-    frontier: engine.frontier,
+    frontier: [...frontier],
     steps: engine.steps,
     message: engine.message,
     activeStates: [...new Set(active.map((config) => config.state))],
@@ -112,7 +115,14 @@ export const useRun = create<RunState>((set, get) => ({
   },
   play: () => {
     const { status, engine } = get();
-    if (!engine || engine.status !== "ready") return;
+    if (!engine) return;
+    if (status === "accepted" || status === "rejected" || status === "limited") {
+      get().stop();
+      if (get().engine?.status !== "ready") return;
+      set({ status: "running" });
+      return;
+    }
+    if (engine.status !== "ready") return;
     if (status === "ready" || status === "paused") set({ status: "running" });
   },
   pause: () => {

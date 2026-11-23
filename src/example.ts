@@ -23,6 +23,22 @@ export const dfaDiagram: Diagram = {
   ],
 };
 
+export const nfaEnds101Diagram: Diagram = {
+  defaults,
+  nodes: [
+    { id: "q0", label: "q_0", col: 0, row: 0, initial: true },
+    { id: "q1", label: "q_1", col: 1, row: 0 },
+    { id: "q2", label: "q_2", col: 2, row: 0 },
+    { id: "q3", label: "q_{3}", col: 3, row: 0, accepting: true },
+  ],
+  edges: [
+    { id: "e1", source: "q0", target: "q0", lines: ["0", "1"], label: "0,1", loop: "above" },
+    { id: "e2", source: "q0", target: "q1", label: "1" },
+    { id: "e3", source: "q1", target: "q2", label: "0", labelPos: { side: "above", distance: "0.01cm" } },
+    { id: "e4", source: "q2", target: "q3", label: "1", labelPos: { side: "above", distance: "0.01cm" } },
+  ],
+};
+
 export const div3Diagram: Diagram = {
   defaults,
   nodes: [
@@ -150,6 +166,7 @@ export const motivatingDiagram: Diagram = {
 
 const DIAGRAMS = {
   dfa: dfaDiagram,
+  nfa101: nfaEnds101Diagram,
   div3: div3Diagram,
   pda: pdaDiagram,
   tm: motivatingDiagram,
@@ -157,7 +174,8 @@ const DIAGRAMS = {
 
 export const EXAMPLES: Record<AutomataKind, { id: string; label: string }[]> = {
   dfa: [
-    { id: "dfa", label: "\\text{Ends with }101" },
+    { id: "dfa", label: "\\text{Ends with }101 \\text{ (DFA)}" },
+    { id: "nfa101", label: "\\text{Ends with }101 \\text{ (NFA)}" },
     { id: "div3", label: "\\text{Divisible by }3" },
   ],
   pda: [{ id: "pda", label: "0^n1^n" }],

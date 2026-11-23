@@ -212,6 +212,9 @@ export function createEngine(machine: Machine, symbols: string[]): Engine {
   if (configs.some((config) => config.outcome === "accept")) {
     return { ...engine, configs, frontier: [], seen: [...seen], nextId: closed.nextId, status: "accepted", message: "Accepted." };
   }
+  if (symbols.length === 0) {
+    return { ...engine, configs, frontier: closed.frontier, seen: [...seen], nextId: closed.nextId, status: "rejected", message: "Rejected." };
+  }
   return { ...engine, configs, frontier: closed.frontier, seen: [...seen], nextId: closed.nextId };
 }
 
@@ -282,5 +285,11 @@ export function stepEngine(engine: Engine, machine: Machine, symbols: string[]):
     };
   }
   if (nextFrontier.length === 0) return finish(next);
+  if (
+    machine.kind === "dfa" &&
+    nextFrontier.every((id) => (byId.get(id)?.cursor ?? 0) >= symbols.length)
+  ) {
+    return finish(next);
+  }
   return next;
 }

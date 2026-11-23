@@ -266,6 +266,23 @@ header p {
   font-size: 0.8rem;
 }
 
+.example-reset {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid #0000002b;
+  background: #ffffff;
+  color: #5c5c5c;
+  font-size: 0.8rem;
+}
+
+.example-reset .inline-center {
+  display: inline-block;
+  vertical-align: middle;
+  margin-bottom: 0.12rem;
+}
+
 .canvas-hint {
   position: absolute;
   z-index: 4;

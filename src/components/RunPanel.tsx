@@ -65,7 +65,6 @@ export function RunPanel() {
   }
   const finished =
     status === "accepted" || status === "rejected" || status === "limited";
-  const halted = configs.filter((config) => config.outcome !== "open");
 
   return (
     <section className="panel run-panel">

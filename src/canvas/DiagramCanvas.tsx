@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { DefaultsForm } from "../components/DefaultsForm";
 import { ExportPanel } from "../components/ExportPanel";
 import { Modal } from "../components/Modal";
-import { EXAMPLES } from "../example";
+import { EXAMPLES, exampleById } from "../example";
 import { parseLength } from "../model/length";
 import { useDiagram } from "../store/diagram";
 import { useRun } from "../store/run";
@@ -12,7 +12,7 @@ import { PT_PX, cellSizePx, centerToCell } from "./geometry";
 import { LatexLabel } from "./LatexLabel";
 import { StateNode } from "./StateNode";
 import { curvePath } from "./tikzPath";
-import { MdAdd, MdArrowDropDown, MdBuild, MdHome, MdQuestionMark, MdRemove } from "react-icons/md";
+import { MdAdd, MdArrowDropDown, MdBuild, MdHome, MdQuestionMark, MdRefresh, MdRemove } from "react-icons/md";
 import { RiEraserFill } from "react-icons/ri";
 
 type View = { x: number; y: number; zoom: number };
@@ -21,6 +21,7 @@ export function DiagramCanvas() {
   const nodes = useDiagram((state) => state.nodes);
   const edges = useDiagram((state) => state.edges);
   const nodeDistance = useDiagram((state) => state.nodeDistance);
+  const scale = useDiagram((state) => state.scale);
   const nodeSize = useDiagram((state) => state.nodeSize);
   const displaySizes = useDiagram((state) => state.displaySizes);
   const selection = useDiagram((state) => state.selection);
@@ -51,6 +52,7 @@ export function DiagramCanvas() {
   const examplesRef = useRef<HTMLDivElement>(null);
   const examples = EXAMPLES[automataKind];
   const selectedExample = examples.find((example) => example.id === exampleId) ?? null;
+  const exampleDirty = exampleId !== null && !sameExample(exampleId, nodes, edges, nodeDistance, scale);
   const length = parseLength(nodeDistance) ?? { magnitude: 3, unit: "cm" };
   const cellPx = cellSizePx(length);
   const viewRef = useRef(view);
@@ -309,7 +311,12 @@ export function DiagramCanvas() {
             )}
             <MdArrowDropDown />
           </button>
-          {examplesOpen ? (
+              {exampleDirty && !examplesOpen ? (
+                <button type="button" className="example-reset" onClick={() => chooseExample(exampleId!)}>
+                  <MdRefresh className="inline-center" /> Reset example
+                </button>
+              ) : null}
+              {examplesOpen ? (
             <div className="example-options" role="listbox" aria-label="Examples">
               <button type="button" className="example-placeholder" disabled>
                 -- Load an example --
@@ -517,6 +524,23 @@ export function DiagramCanvas() {
         <p className="canvas-hint">{running ? "Switch to Build to add states." : "Double-click to add a state."}</p>
       ) : null}
     </div>
+  );
+}
+
+function sameExample(
+  id: string,
+  nodes: { id: string }[],
+  edges: { id: string }[],
+  nodeDistance: string,
+  scale: number,
+) {
+  const example = exampleById(id);
+  if (!example) return true;
+  return (
+    nodeDistance === example.defaults.nodeDistance &&
+    scale === example.defaults.scale &&
+    JSON.stringify(nodes) === JSON.stringify(example.nodes) &&
+    JSON.stringify(edges) === JSON.stringify(example.edges)
   );
 }
 

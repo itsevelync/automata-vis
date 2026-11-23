@@ -45,7 +45,6 @@ export function generateTikZ(diagram: Diagram): string {
   const distance = parseLength(diagram.defaults.nodeDistance);
   if (!distance) throw new Error("Invalid node distance");
   const lines = [
-    "\\usetikzlibrary{automata,arrows,positioning}",
     "\\begin{tikzpicture}[",
     "    ->,",
     "    >=stealth',",

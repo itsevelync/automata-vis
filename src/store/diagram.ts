@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { exampleFor } from "../example";
+import { exampleById, exampleFor } from "../example";
 import { isValidId, nextStateId } from "../model/ids";
 import { DEFAULT_STATE_NODE_SIZE } from "../canvas/geometry";
 import { displayEdgeLabel } from "../model/labels";
@@ -40,7 +40,7 @@ interface DiagramState {
   setDisplaySize: (id: string, size: number) => void;
   select: (selection: Selection) => void;
   setAutomataKind: (kind: AutomataKind) => void;
-  loadExample: () => void;
+  loadExample: (id?: string) => void;
   clear: () => void;
 }
 
@@ -177,8 +177,8 @@ export const useDiagram = create<DiagramState>((set, get) => ({
   },
   select: (selection) => set({ selection }),
   setAutomataKind: (automataKind) => set({ automataKind }),
-  loadExample: () => {
-    const example = exampleFor(get().automataKind);
+  loadExample: (id) => {
+    const example = (id ? exampleById(id) : null) ?? exampleFor(get().automataKind);
     set({
       nodes: example.nodes.map((node) => ({ ...node })),
       edges: example.edges.map((edge) => ({

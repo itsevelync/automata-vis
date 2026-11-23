@@ -2,15 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { DefaultsForm } from "../components/DefaultsForm";
 import { ExportPanel } from "../components/ExportPanel";
 import { Modal } from "../components/Modal";
+import { EXAMPLES } from "../example";
 import { parseLength } from "../model/length";
 import { useDiagram } from "../store/diagram";
 import { useRun } from "../store/run";
 import { useSession } from "../store/session";
 import { EDGE_STROKE, EdgeLabel, buildEdgeCurve } from "./AutomataEdge";
 import { PT_PX, cellSizePx, centerToCell } from "./geometry";
+import { LatexLabel } from "./LatexLabel";
 import { StateNode } from "./StateNode";
 import { curvePath } from "./tikzPath";
-import { MdAdd, MdHome, MdRemove } from "react-icons/md";
+import { MdAdd, MdArrowDropDown, MdBuild, MdHome, MdQuestionMark, MdRemove } from "react-icons/md";
+import { RiEraserFill } from "react-icons/ri";
 
 type View = { x: number; y: number; zoom: number };
 
@@ -28,6 +31,7 @@ export function DiagramCanvas() {
   const select = useDiagram((state) => state.select);
   const loadExample = useDiagram((state) => state.loadExample);
   const clear = useDiagram((state) => state.clear);
+  const automataKind = useDiagram((state) => state.automataKind);
   const mode = useSession((state) => state.mode);
   const activeStates = useRun((state) => state.activeStates);
   const activeEdges = useRun((state) => state.activeEdges);
@@ -41,6 +45,12 @@ export function DiagramCanvas() {
   const [view, setView] = useState<View>({ x: 48, y: 48, zoom: 1 });
   const [panning, setPanning] = useState(false);
   const [modal, setModal] = useState<"help" | "tikz" | "defaults" | null>(null);
+  const [examplesOpen, setExamplesOpen] = useState(false);
+  const [exampleId, setExampleId] = useState<string | null>(null);
+  const [exampleIndex, setExampleIndex] = useState(0);
+  const examplesRef = useRef<HTMLDivElement>(null);
+  const examples = EXAMPLES[automataKind];
+  const selectedExample = examples.find((example) => example.id === exampleId) ?? null;
   const length = parseLength(nodeDistance) ?? { magnitude: 3, unit: "cm" };
   const cellPx = cellSizePx(length);
   const viewRef = useRef(view);
@@ -91,6 +101,38 @@ export function DiagramCanvas() {
       y: (rect.height - (minY + maxY) * zoom) / 2,
     });
   }
+
+  useEffect(() => {
+    setExampleId(null);
+    setExamplesOpen(false);
+  }, [automataKind]);
+
+  function chooseExample(id: string) {
+    setExampleId(id);
+    setExamplesOpen(false);
+    loadExample(id);
+    window.setTimeout(() => fit(useDiagram.getState().nodes), 0);
+  }
+
+  function moveExample(delta: number) {
+    if (examples.length === 0) return;
+    if (!examplesOpen) {
+      const current = examples.findIndex((example) => example.id === exampleId);
+      setExampleIndex(current >= 0 ? current : 0);
+      setExamplesOpen(true);
+      return;
+    }
+    setExampleIndex((exampleIndex + delta + examples.length) % examples.length);
+  }
+
+  useEffect(() => {
+    if (!examplesOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!examplesRef.current?.contains(event.target as Node)) setExamplesOpen(false);
+    };
+    window.addEventListener("pointerdown", onPointerDown);
+    return () => window.removeEventListener("pointerdown", onPointerDown);
+  }, [examplesOpen]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -239,34 +281,79 @@ export function DiagramCanvas() {
       <div className="toolbar">
         {running ? null : (
           <>
+            <div className={examplesOpen ? "example-menu open" : "example-menu"} ref={examplesRef}>
+              <button
+                type="button"
+                className={selectedExample ? "example-select chosen" : "example-select"}
+                aria-haspopup="listbox"
+                aria-expanded={examplesOpen}
+                onClick={() => setExamplesOpen((open) => !open)}
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    moveExample(1);
+                  } else if (event.key === "ArrowUp") {
+                    event.preventDefault();
+                    moveExample(-1);
+                  } else if (event.key === "Enter" && examplesOpen) {
+                    event.preventDefault();
+                    const example = examples[exampleIndex];
+                    if (example) chooseExample(example.id);
+                  } else if (event.key === "Escape") {
+                    setExamplesOpen(false);
+                  }
+                }}
+              >
+                {selectedExample ? (
+                  <LatexLabel className="example-math" label={selectedExample.label} />
+                ) : (
+                  "-- Load an example --"
+                )}
+                <MdArrowDropDown />
+              </button>
+              {examplesOpen ? (
+                <div className="example-options" role="listbox" aria-label="Examples">
+                  <button type="button" className="example-placeholder" disabled>
+                    -- Load an example --
+                  </button>
+                  {examples.map((example, index) => (
+                    <button
+                      key={example.id}
+                      type="button"
+                      role="option"
+                      aria-selected={index === exampleIndex}
+                      className={index === exampleIndex ? "active" : undefined}
+                      onMouseEnter={() => setExampleIndex(index)}
+                      onClick={() => chooseExample(example.id)}
+                    >
+                      <LatexLabel className="example-math" label={example.label} />
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
             <button
               type="button"
-              onClick={() => {
-                loadExample();
-                window.setTimeout(() => fit(useDiagram.getState().nodes), 0);
-              }}
-            >
-              Load example
-            </button>
-            <button
-              type="button"
+              title="Clear canvas"
               onClick={() => {
                 clear();
+                setExampleId(null);
+                setExamplesOpen(false);
                 setView({ x: 48, y: 48, zoom: 1 });
               }}
             >
-              Clear
+              <RiEraserFill />
             </button>
-            <button type="button" onClick={() => setModal("defaults")}>
-              Defaults
+            <button title="Canvas settings" type="button" onClick={() => setModal("defaults")}>
+              <MdBuild />
+            </button>
+            <button title="Help" type="button" onClick={() => setModal("help")}>
+              <MdQuestionMark />
             </button>
           </>
         )}
-        <button type="button" onClick={() => setModal("help")}>
-          Help
-        </button>
-        <button type="button" onClick={() => setModal("tikz")}>
-          Get TikZ code
+        <button title="Get LaTeX code" type="button" onClick={() => setModal("tikz")}>
+          Get LaTeX code
         </button>
       </div>
       <Modal open={modal === "help"} title="Help" onClose={() => setModal(null)}>

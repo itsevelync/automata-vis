@@ -83,7 +83,8 @@ header {
 }
 
 .mode-toggle button[aria-pressed="true"] {
-  background: #efe2cc;
+  background-color: black;
+  color: white;
 }
 
 .automata-kind {
@@ -191,6 +192,78 @@ header p {
   left: 0.75rem;
   display: flex;
   gap: 0.4rem;
+}
+
+.example-menu {
+  position: relative;
+}
+
+.example-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  width: 11rem;
+  border: 1px solid #0000002b;
+  background: #ffffff;
+  padding: 0.35rem 0.3rem 0.35rem 0.45rem;
+  color: #5c5c5c;
+}
+
+.example-select.chosen {
+  color: #000000;
+}
+
+.example-select:hover {
+  background: #ffffff;
+}
+
+.example-menu.open .example-select {
+  border-bottom-color: #0000002b;
+}
+
+.example-options {
+  position: absolute;
+  z-index: 6;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #0000002b;
+  border-top: 1px solid #0000002b;
+}
+
+.example-options button {
+  padding: 0.28rem 0.45rem;
+  text-align: left;
+  background: #ffffff;
+  border: none;
+  font-size: 0.8rem;
+  font-style: normal;
+  color: #000000;
+}
+
+.example-options .example-placeholder {
+  color: #5c5c5c;
+  font-size: 1rem;
+  font-style: normal;
+  cursor: default;
+}
+
+.example-options .example-placeholder:hover {
+  background: #ffffff;
+}
+
+.example-options button.active,
+.example-options button:hover {
+  background: #efe2cc;
+}
+
+.example-math {
+  font-style: normal;
+  font-size: 0.8rem;
 }
 
 .canvas-hint {
@@ -304,6 +377,12 @@ aside {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
+}
+
+.panel .speed-control {
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
 }
 
 .run-math {
@@ -513,6 +592,11 @@ aside {
   margin-top: 0.45rem;
 }
 
+.export-panel textarea.tikz-preamble {
+  flex: none;
+  min-height: 0rem;
+}
+
 .export-panel textarea {
   flex: 1;
   min-height: 220px;
@@ -520,6 +604,7 @@ aside {
   font-family: Consolas, "Courier New", monospace;
   font-size: 0.75rem;
   line-height: 1.35;
+  resize: none;
 }
 
 .state-node {

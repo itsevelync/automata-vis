@@ -23,6 +23,23 @@ export const dfaDiagram: Diagram = {
   ],
 };
 
+export const div3Diagram: Diagram = {
+  defaults,
+  nodes: [
+    { id: "q0", label: "q_0", col: 0, row: 0, initial: true, accepting: true },
+    { id: "q1", label: "q_1", col: 1, row: 0 },
+    { id: "q2", label: "q_2", col: 2, row: 0 },
+  ],
+  edges: [
+    { id: "e1", source: "q0", target: "q0", label: "0", loop: "above" },
+    { id: "e2", source: "q0", target: "q1", label: "1" },
+    { id: "e3", source: "q1", target: "q0", label: "1", bend: "left" },
+    { id: "e4", source: "q1", target: "q2", label: "0" },
+    { id: "e5", source: "q2", target: "q1", label: "0", bend: "left" },
+    { id: "e6", source: "q2", target: "q2", label: "1", loop: "below" },
+  ],
+};
+
 export const pdaDiagram: Diagram = {
   defaults,
   nodes: [
@@ -131,8 +148,26 @@ export const motivatingDiagram: Diagram = {
   ],
 };
 
+const DIAGRAMS = {
+  dfa: dfaDiagram,
+  div3: div3Diagram,
+  pda: pdaDiagram,
+  tm: motivatingDiagram,
+} as const;
+
+export const EXAMPLES: Record<AutomataKind, { id: string; label: string }[]> = {
+  dfa: [
+    { id: "dfa", label: "\\text{Ends with }101" },
+    { id: "div3", label: "\\text{Divisible by }3" },
+  ],
+  pda: [{ id: "pda", label: "0^n1^n" }],
+  tm: [{ id: "tm", label: "1^{n^2}" }],
+};
+
 export function exampleFor(kind: AutomataKind): Diagram {
-  if (kind === "pda") return pdaDiagram;
-  if (kind === "dfa") return dfaDiagram;
-  return motivatingDiagram;
+  return kind === "pda" ? pdaDiagram : kind === "tm" ? motivatingDiagram : dfaDiagram;
+}
+
+export function exampleById(id: string): Diagram | null {
+  return id in DIAGRAMS ? DIAGRAMS[id as keyof typeof DIAGRAMS] : null;
 }

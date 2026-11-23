@@ -96,72 +96,76 @@ export function RunPanel() {
           </button>
           {status !== "idle" ? (
           <>
-          <div className="run-controls">
-            <button
-              type="button"
-              onClick={back}
-              disabled={history.length === 0 || status === "running"}
-            >
-              <MdSkipPrevious />
-            </button>
-            <button
-              type="button"
-              onClick={play}
-              disabled={status !== "ready" && status !== "paused"}
-            >
-              <MdPlayArrow />
-            </button>
-            <button
-              type="button"
-              onClick={pause}
-              disabled={status !== "running"}
-            >
-              <MdPause />
-            </button>
-            <button
-              type="button"
-              onClick={step}
-              disabled={status !== "ready" && status !== "paused"}
-            >
-              <MdSkipNext />
-            </button>
-            <button
-              type="button"
-              onClick={stop}
-            >
-              Reset
-            </button>
-            <button
-              type="button"
-              onClick={skip}
-              disabled={
-                status !== "ready" &&
-                status !== "paused" &&
-                status !== "running"
-              }
-            >
-              Skip
-            </button>
+          <div>
+            <p>Playback Controls</p>
+            <div className="run-controls">
+              <button
+                type="button"
+                onClick={back}
+                disabled={history.length === 0 || status === "running"}
+              >
+                <MdSkipPrevious />
+              </button>
+              <button
+                type="button"
+                onClick={play}
+                disabled={status !== "ready" && status !== "paused"}
+              >
+                <MdPlayArrow />
+              </button>
+              <button
+                type="button"
+                onClick={pause}
+                disabled={status !== "running"}
+              >
+                <MdPause />
+              </button>
+              <button
+                type="button"
+                onClick={step}
+                disabled={status !== "ready" && status !== "paused"}
+              >
+                <MdSkipNext />
+              </button>
+              <button
+                type="button"
+                onClick={stop}
+              >
+                Reset
+              </button>
+              <button
+                type="button"
+                onClick={skip}
+                disabled={
+                  status !== "ready" &&
+                  status !== "paused" &&
+                  status !== "running"
+                }
+              >
+                Skip
+              </button>
+            </div>
+            <label className="speed-control">
+              Speed
+              <input
+                type="range"
+                min={50}
+                max={1000}
+                step={50}
+                value={speed}
+                style={{flexGrow: 1}}
+                onChange={(event) =>
+                  setSpeed(Number(event.target.value))
+                }
+              />
+            </label>
           </div>
-          <label>
-            Speed
-            <input
-              type="range"
-              min={50}
-              max={1000}
-              step={50}
-              value={speed}
-              onChange={(event) =>
-                setSpeed(Number(event.target.value))
-              }
-            />
-            <p className="muted">{speed} ms per step</p>
-          </label>
+          <p>Current Configuration</p>
           <p>
-            Steps <strong>{steps}</strong>
+            Steps: <strong>{steps}</strong>
           </p>
           <p>
-            State{" "}
+            State:{" "}
             {live.length === 0 ? (
               <span className="muted">none</span>
             ) : (

@@ -32,7 +32,7 @@ describe("generateTikZ", () => {
     const tikz = generateTikZ(diagram(motivating));
     expect(tikz).toContain("on grid");
     expect(tikz).toContain("node distance=3cm");
-    expect(tikz).toContain("\\usetikzlibrary{automata,arrows,positioning}");
+    expect(tikz).not.toContain("\\usetikzlibrary");
     expect(tikz).toContain(
       "\\node[state,accepting] (qa) {$q_\\text{accept}$};",
     );

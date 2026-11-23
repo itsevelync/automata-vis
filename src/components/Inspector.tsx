@@ -397,7 +397,7 @@ function TransitionFields({
         ref={(element) => inputRef(field.part, element)}
         aria-label={field.name}
         value={labelToInput(parts[field.part])}
-        placeholder={placeholder}
+        placeholder={kind === "tm" ? "\u2423" : placeholder}
         onFocus={() => onFocus(field.part)}
         onChange={(event) => update(field.part, event.target.value)}
       />

@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { LatexLabel } from "../canvas/LatexLabel";
 import { Modal } from "./Modal";
-import { compile, BLANK } from "../sim/compile";
+import { INPUT_CAP, compile, BLANK } from "../sim/compile";
 import type { SimConfig } from "../sim/step";
 import { useDiagram } from "../store/diagram";
 import { useRun } from "../store/run";
@@ -56,11 +56,11 @@ export function RunPanel() {
     [configs],
   );
   const live: SimConfig[] = [];
-  const liveKeys = new Set<string>();
+  const liveStates = new Set<string>();
   for (const id of frontier) {
     const config = configsById.get(id);
-    if (!config || liveKeys.has(config.key)) continue;
-    liveKeys.add(config.key);
+    if (!config || liveStates.has(config.state)) continue;
+    liveStates.add(config.state);
     live.push(config);
   }
   const finished =
@@ -79,6 +79,7 @@ export function RunPanel() {
             <input
               ref={inputRef}
               value={input}
+              maxLength={INPUT_CAP}
               disabled={status !== "idle"}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {

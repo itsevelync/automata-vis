@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { compile, tokenize, type Machine } from "../sim/compile";
+import { INPUT_CAP, compile, tokenize, type Machine } from "../sim/compile";
 import { createEngine, stepEngine, type Engine, type SimConfig } from "../sim/step";
 import { useDiagram } from "./diagram";
 
@@ -77,6 +77,10 @@ export const useRun = create<RunState>((set, get) => ({
       return;
     }
     const symbols = tokenize(get().input);
+    if (symbols.length > INPUT_CAP) {
+      set({ ...cleared(), message: `Input is limited to ${INPUT_CAP} symbols.` });
+      return;
+    }
     const engine = createEngine(machine, symbols);
     const status: RunStatus = engine.status === "ready" ? "ready" : engine.status;
     set({ machine, symbols, engine, status, history: [], ...view(engine) });

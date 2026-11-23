@@ -57,6 +57,7 @@ function renderEdgeLine(line: string, kind: AutomataKind): string {
   const parts = splitTransition(line, kind).map((part, index) => {
     if (part !== "") return part;
     if (kind === "tm" && index === 2) return "R";
+    if (kind === "tm") return BLANK;
     return EPSILON;
   }) as TransitionParts;
   return joinTransition(parts, kind);

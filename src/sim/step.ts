@@ -1,4 +1,4 @@
-import { BLANK, BRANCH_CAP, STEP_CAP, isEpsilon, type CompiledTransition, type Machine } from "./compile";
+import { BLANK, BRANCH_CAP, EPSILON_DEPTH, STEP_CAP, isEpsilon, type CompiledTransition, type Machine } from "./compile";
 
 export interface SimConfig {
   id: string;
@@ -122,6 +122,9 @@ function finish(engine: Engine): Engine {
   if (halted(engine.configs)) {
     return { ...engine, status: "accepted", message: "Accepted.", frontier: [] };
   }
+  if (engine.configs.some((config) => config.outcome === "loop")) {
+    return { ...engine, status: "rejected", message: "Rejected. Loop detected.", frontier: [] };
+  }
   return { ...engine, status: "rejected", message: "Rejected.", frontier: [] };
 }
 
@@ -140,13 +143,19 @@ function closeEpsilon(
   bySource: Map<string, CompiledTransition[]>,
   seen: Set<string>,
   nextId: number,
-): { frontier: string[]; nextId: number } {
+): { frontier: string[]; nextId: number; limited: boolean } {
   const frontier: string[] = [];
-  const queue = [...seeds];
+  const queue = seeds.map((id) => ({ id, depth: 0 }));
+  let limited = false;
   while (queue.length > 0) {
-    const current = byId.get(queue.shift()!);
+    const item = queue.shift()!;
+    const current = byId.get(item.id);
     if (!current) continue;
     if (current.outcome === "open") frontier.push(current.id);
+    if (item.depth >= EPSILON_DEPTH) {
+      limited = true;
+      continue;
+    }
     const silent = applicable(bySource.get(current.state) ?? [], machine, symbols, current).filter(
       (transition) => isEpsilon(transition.read),
     );
@@ -166,10 +175,10 @@ function closeEpsilon(
       }
       configs.push(child);
       byId.set(child.id, child);
-      queue.push(child.id);
+      queue.push({ id: child.id, depth: item.depth + 1 });
     }
   }
-  return { frontier: [...new Set(frontier)], nextId };
+  return { frontier: [...new Set(frontier)], nextId, limited };
 }
 
 export function createEngine(machine: Machine, symbols: string[]): Engine {

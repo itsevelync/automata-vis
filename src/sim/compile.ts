@@ -5,6 +5,8 @@ export const EPSILON = "\\varepsilon";
 export const BLANK = "\\textvisiblespace";
 export const STEP_CAP = 500;
 export const BRANCH_CAP = 80;
+export const EPSILON_DEPTH = 32;
+export const INPUT_CAP = 1000;
 
 export interface CompiledTransition {
   edgeId: string;
@@ -98,7 +100,7 @@ export function compile(kind: AutomataKind, nodes: DiagramNode[], edges: Diagram
           read: first,
           pop: "",
           push: [],
-          write: second || EPSILON,
+          write: second || BLANK,
           move: third === "L" ? "L" : "R",
         });
         return;

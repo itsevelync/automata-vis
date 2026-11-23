@@ -583,11 +583,13 @@ aside {
   color: #5c5c5c;
 }
 
-.stack-state {
+.stack-state,
+.tape-state {
   margin-right: 0.35rem;
 }
 
-.stack-state .katex {
+.stack-state .katex,
+.tape-state .katex {
   font-size: 0.8rem;
 }
 

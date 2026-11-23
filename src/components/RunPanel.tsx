@@ -187,15 +187,14 @@ export function RunPanel() {
           </>
           ) : null}
           {automataKind === "tm"
-            ? live
-                .slice(0, 4)
-                .map((config) => (
-                  <Tape
-                    key={config.id}
-                    config={config}
-                    inputLength={symbols.length}
-                  />
-                ))
+            ? live.map((config) => (
+                <Tape
+                  key={config.id}
+                  config={config}
+                  label={labels.get(config.state) ?? config.state}
+                  inputLength={symbols.length}
+                />
+              ))
             : null}
           {(automataKind === "dfa" || automataKind === "pda") &&
           symbols.length > 0 &&
@@ -261,9 +260,11 @@ function InputCursor({
 
 function Tape({
   config,
+  label,
   inputLength,
 }: {
   config: SimConfig;
+  label: string;
   inputLength: number;
 }) {
   const tapeRef = useRef<HTMLDivElement>(null);
@@ -294,7 +295,9 @@ function Tape({
     tape.scrollLeft += headCenter - viewCenter;
   }, [config.head, cells.length]);
   return (
-    <div className="tape" aria-label="Tape" ref={tapeRef}>
+    <div className="tape-view">
+      <LatexLabel className="tape-state" label={label} />
+      <div className="tape" aria-label="Tape" ref={tapeRef}>
       <span className="tape-ellipsis">...</span>
       {cells.map((index) => (
         <span
@@ -311,6 +314,7 @@ function Tape({
         </span>
       ))}
       <span className="tape-ellipsis">...</span>
+      </div>
     </div>
   );
 }

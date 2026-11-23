@@ -120,6 +120,9 @@ describe("simulator", () => {
     expect(run("dfa", nfaEnds101Diagram.nodes, nfaEnds101Diagram.edges, "101").steps).toBe(3);
     expect(run("dfa", nfaEnds101Diagram.nodes, nfaEnds101Diagram.edges, "100").status).toBe("rejected");
     expect(run("pda", pdaDiagram.nodes, pdaDiagram.edges, "").status).toBe("accepted");
+    const pda = compile("pda", pdaDiagram.nodes, pdaDiagram.edges);
+    const started = createEngine(pda, tokenize("0011"));
+    expect(started.frontier.map((id) => started.configs.find((config) => config.id === id)?.state)).toContain("q1");
     expect(run("pda", pdaDiagram.nodes, pdaDiagram.edges, "0011").status).toBe("accepted");
     expect(run("pda", pdaDiagram.nodes, pdaDiagram.edges, "001").status).toBe("rejected");
   });

@@ -279,71 +279,71 @@ export function DiagramCanvas() {
       }}
     >
       <div className="toolbar">
+        <div className={examplesOpen ? "example-menu open" : "example-menu"} ref={examplesRef}>
+          <button
+            type="button"
+            className={selectedExample ? "example-select chosen" : "example-select"}
+            aria-haspopup="listbox"
+            aria-expanded={examplesOpen}
+            onClick={() => setExamplesOpen((open) => !open)}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowDown") {
+                event.preventDefault();
+                moveExample(1);
+              } else if (event.key === "ArrowUp") {
+                event.preventDefault();
+                moveExample(-1);
+              } else if (event.key === "Enter" && examplesOpen) {
+                event.preventDefault();
+                const example = examples[exampleIndex];
+                if (example) chooseExample(example.id);
+              } else if (event.key === "Escape") {
+                setExamplesOpen(false);
+              }
+            }}
+          >
+            {selectedExample ? (
+              <LatexLabel className="example-math" label={selectedExample.label} />
+            ) : (
+              "-- Load an example --"
+            )}
+            <MdArrowDropDown />
+          </button>
+          {examplesOpen ? (
+            <div className="example-options" role="listbox" aria-label="Examples">
+              <button type="button" className="example-placeholder" disabled>
+                -- Load an example --
+              </button>
+              {examples.map((example, index) => (
+                <button
+                  key={example.id}
+                  type="button"
+                  role="option"
+                  aria-selected={index === exampleIndex}
+                  className={index === exampleIndex ? "active" : undefined}
+                  onMouseEnter={() => setExampleIndex(index)}
+                  onClick={() => chooseExample(example.id)}
+                >
+                  <LatexLabel className="example-math" label={example.label} />
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+        <button
+          type="button"
+          title="Clear canvas"
+          onClick={() => {
+            clear();
+            setExampleId(null);
+            setExamplesOpen(false);
+            setView({ x: 48, y: 48, zoom: 1 });
+          }}
+        >
+          <RiEraserFill />
+        </button>
         {running ? null : (
           <>
-            <div className={examplesOpen ? "example-menu open" : "example-menu"} ref={examplesRef}>
-              <button
-                type="button"
-                className={selectedExample ? "example-select chosen" : "example-select"}
-                aria-haspopup="listbox"
-                aria-expanded={examplesOpen}
-                onClick={() => setExamplesOpen((open) => !open)}
-                onKeyDown={(event) => {
-                  if (event.key === "ArrowDown") {
-                    event.preventDefault();
-                    moveExample(1);
-                  } else if (event.key === "ArrowUp") {
-                    event.preventDefault();
-                    moveExample(-1);
-                  } else if (event.key === "Enter" && examplesOpen) {
-                    event.preventDefault();
-                    const example = examples[exampleIndex];
-                    if (example) chooseExample(example.id);
-                  } else if (event.key === "Escape") {
-                    setExamplesOpen(false);
-                  }
-                }}
-              >
-                {selectedExample ? (
-                  <LatexLabel className="example-math" label={selectedExample.label} />
-                ) : (
-                  "-- Load an example --"
-                )}
-                <MdArrowDropDown />
-              </button>
-              {examplesOpen ? (
-                <div className="example-options" role="listbox" aria-label="Examples">
-                  <button type="button" className="example-placeholder" disabled>
-                    -- Load an example --
-                  </button>
-                  {examples.map((example, index) => (
-                    <button
-                      key={example.id}
-                      type="button"
-                      role="option"
-                      aria-selected={index === exampleIndex}
-                      className={index === exampleIndex ? "active" : undefined}
-                      onMouseEnter={() => setExampleIndex(index)}
-                      onClick={() => chooseExample(example.id)}
-                    >
-                      <LatexLabel className="example-math" label={example.label} />
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-            <button
-              type="button"
-              title="Clear canvas"
-              onClick={() => {
-                clear();
-                setExampleId(null);
-                setExamplesOpen(false);
-                setView({ x: 48, y: 48, zoom: 1 });
-              }}
-            >
-              <RiEraserFill />
-            </button>
             <button title="Canvas settings" type="button" onClick={() => setModal("defaults")}>
               <MdBuild />
             </button>

@@ -170,7 +170,7 @@ export function RunPanel() {
           <p>
             State:{" "}
             {live.length === 0 ? (
-              <span className="muted">none</span>
+              <span className="muted">No states possible</span>
             ) : (
               live.map((config) => (
                 <LatexLabel
@@ -207,25 +207,16 @@ export function RunPanel() {
                   />
                 ))
             : null}
-          {automataKind === "dfa" && symbols.length > 0 && live[0] ? (
+          {automataKind === "dfa" && symbols.length > 0 && (live[0] || finished) ? (
             <InputCursor
               symbols={symbols}
-              cursor={live[0].cursor}
+              cursor={live[0]?.cursor ?? symbols.length}
             />
           ) : null}
           {message ? (
             <p className={finished ? "run-result" : "muted"}>
               {message}
-            </p>
-          ) : null}
-          {finished ? (
-            <div className="run-summary">
-              <button
-                type="button"
-                onClick={() => setTraceOpen(true)}
-              >
-                Open decision tree
-              </button>
+              {finished && <>{" "}<span onClick={() => setTraceOpen(true)}>(Open decision tree)</span></>}
               <Modal
                 open={traceOpen}
                 title="Decision tree"
@@ -233,39 +224,7 @@ export function RunPanel() {
               >
                 <Trace configs={configs} labels={labels} />
               </Modal>
-              {automataKind === "tm"
-                ? halted
-                    .filter(
-                      (config) =>
-                        config.outcome === "accept" ||
-                        halted.length === 1,
-                    )
-                    .slice(0, 3)
-                    .map((config) => (
-                      <Tape
-                        key={`final-${config.id}`}
-                        config={config}
-                        inputLength={symbols.length}
-                      />
-                    ))
-                : null}
-              {automataKind === "pda"
-                ? halted
-                    .filter(
-                      (config) =>
-                        config.outcome === "accept" ||
-                        halted.length === 1,
-                    )
-                    .slice(0, 3)
-                    .map((config) => (
-                      <StackView
-                        key={`final-${config.id}`}
-                        config={config}
-                        symbols={symbols}
-                      />
-                    ))
-                : null}
-            </div>
+            </p>
           ) : null}
         </>
       )}
@@ -290,7 +249,7 @@ function InputCursor({
           <LatexLabel className="run-math" label={symbol} />
         </span>
       ))}
-      {cursor >= symbols.length ? <span className="cursor" /> : null}
+      {cursor >= symbols.length ? <span className="cursor end" /> : null}
     </p>
   );
 }
@@ -305,20 +264,20 @@ function Tape({
   const tapeRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLSpanElement>(null);
   const occupied = Object.keys(config.tape).map(Number);
-  const left = Math.min(
-    config.head,
-    ...(occupied.length ? occupied : [config.head]),
-  );
-  const right = Math.max(
-    config.head,
-    ...(occupied.length ? occupied : [config.head]),
+  const contentLeft = Math.min(0, ...(occupied.length ? occupied : [0]));
+  const contentRight = Math.max(
+    inputLength - 1,
+    ...(occupied.length ? occupied : [inputLength - 1]),
   );
   const extra = inputLength < 10 ? 10 - inputLength : 0;
   const leftPad = Math.max(1, Math.floor(extra / 2));
   const rightPad = Math.max(1, extra - Math.floor(extra / 2));
+  let min = contentLeft - leftPad;
+  let max = contentRight + rightPad;
+  if (config.head < min) min = config.head;
+  if (config.head > max) max = config.head;
   const cells = [];
-  for (let index = left - leftPad; index <= right + rightPad; index += 1)
-    cells.push(index);
+  for (let index = min; index <= max; index += 1) cells.push(index);
   useLayoutEffect(() => {
     const tape = tapeRef.current;
     const head = headRef.current;
@@ -403,8 +362,8 @@ function Trace({
   const seen = new Set<string>();
   for (const config of configs) {
     if (!config.parentId) continue;
-    const parent = byId.get(config.parentId);
-    if (!parent || parent.steps === config.steps) continue;
+    const parent = previousLevel(config, byId);
+    if (!parent) continue;
     const key = `${parent.steps}:${parent.state}:${config.steps}:${config.state}`;
     if (seen.has(key)) continue;
     seen.add(key);
@@ -523,6 +482,17 @@ function Trace({
       )}
     </svg>
   );
+}
+
+function previousLevel(config: SimConfig, byId: Map<string, SimConfig>): SimConfig | null {
+  let current = config;
+  while (current.parentId) {
+    const parent = byId.get(current.parentId);
+    if (!parent) return null;
+    if (parent.steps !== config.steps) return parent;
+    current = parent;
+  }
+  return null;
 }
 
 function betterOutcome(

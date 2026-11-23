@@ -147,7 +147,9 @@ function closeEpsilon(
     const current = byId.get(queue.shift()!);
     if (!current || current.outcome !== "open") continue;
     frontier.push(current.id);
-    const silent = (bySource.get(current.state) ?? []).filter((transition) => isEpsilon(transition.read));
+    const silent = applicable(bySource.get(current.state) ?? [], machine, symbols, current).filter(
+      (transition) => isEpsilon(transition.read),
+    );
     for (const transition of silent) {
       const child = apply(machine, current, transition, `c${nextId}`);
       nextId += 1;
@@ -204,7 +206,7 @@ export function createEngine(machine: Machine, symbols: string[]): Engine {
     root.outcome = "accept";
     return { ...engine, status: "accepted", message: "Accepted.", frontier: [] };
   }
-  if (machine.kind !== "dfa") return engine;
+  if (machine.kind === "tm") return engine;
   const configs = [root];
   const byId = new Map([[root.id, root]]);
   const seen = new Set([root.key]);
@@ -231,7 +233,7 @@ export function stepEngine(engine: Engine, machine: Machine, symbols: string[]):
     const config = byId.get(id);
     if (!config || config.outcome !== "open") continue;
     const moves = applicable(bySource.get(config.state) ?? [], machine, symbols, config).filter(
-      (transition) => machine.kind !== "dfa" || !isEpsilon(transition.read),
+      (transition) => machine.kind === "tm" || !isEpsilon(transition.read),
     );
     if (moves.length === 0) {
       config.outcome = "reject";
@@ -258,7 +260,7 @@ export function stepEngine(engine: Engine, machine: Machine, symbols: string[]):
       }
       configs.push(child);
       byId.set(child.id, child);
-      if (machine.kind === "dfa") {
+      if (machine.kind !== "tm") {
         const closed = closeEpsilon(machine, symbols, [child.id], configs, byId, bySource, seen, nextId);
         nextId = closed.nextId;
         nextFrontier.push(...closed.frontier);
@@ -286,7 +288,7 @@ export function stepEngine(engine: Engine, machine: Machine, symbols: string[]):
   }
   if (nextFrontier.length === 0) return finish(next);
   if (
-    machine.kind === "dfa" &&
+    machine.kind !== "tm" &&
     nextFrontier.every((id) => (byId.get(id)?.cursor ?? 0) >= symbols.length)
   ) {
     return finish(next);

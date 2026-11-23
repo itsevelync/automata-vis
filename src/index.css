@@ -299,6 +299,10 @@ aside {
   letter-spacing: 0.08em;
 }
 
+.panel p {
+  margin: 0;
+}
+
 .panel label {
   display: flex;
   flex-direction: column;
@@ -395,6 +399,12 @@ aside {
   font-weight: 700;
 }
 
+.run-result span {
+  text-decoration: underline;
+  font-weight: normal;
+  cursor: pointer;
+}
+
 .input-cursor {
   display: flex;
   align-items: center;
@@ -405,6 +415,16 @@ aside {
 .input-cursor .cursor {
   box-shadow: inset 2px 0 0 #1d4ed8;
   padding-left: 0.2rem;
+}
+
+.input-cursor .cursor.end {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  padding: 0;
+  box-shadow: none;
+  background: #1d4ed8;
+  vertical-align: middle;
 }
 
 .tape {

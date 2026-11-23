@@ -127,6 +127,25 @@ describe("simulator", () => {
     expect(run("pda", pdaDiagram.nodes, pdaDiagram.edges, "001").status).toBe("rejected");
   });
 
+  it("keeps an epsilon move after the last PDA symbol", () => {
+    const nodes = [
+      node("q1", { initial: true, accepting: true }),
+      node("q2", { accepting: true }),
+    ];
+    const edges = [
+      edge("e1", "q1", "q1", "0,\\varepsilon\\to 0"),
+      edge("e2", "q1", "q2", "\\varepsilon,\\varepsilon\\to\\varepsilon"),
+    ];
+    const machine = compile("pda", nodes, edges);
+    const symbols = tokenize("00");
+    let engine = createEngine(machine, symbols);
+    engine = stepEngine(engine, machine, symbols);
+    engine = stepEngine(engine, machine, symbols);
+    const bottom = engine.configs.filter((config) => config.steps === engine.steps).map((config) => config.state);
+    expect(bottom).toContain("q1");
+    expect(bottom).toContain("q2");
+  });
+
   it("requires a single initial state", () => {
     expect(compile("dfa", [node("q0"), node("q1", { accepting: true })], []).errors).toContain(
       "Mark one state as initial.",

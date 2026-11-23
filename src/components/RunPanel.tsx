@@ -164,6 +164,7 @@ export function RunPanel() {
             </label>
           </div>
           <p>Current Configuration</p>
+          <p className="muted">Note that &epsilon;-transitions are taken before the next symbol is read from the input.</p>
           <p>
             Steps: <strong>{steps}</strong>
           </p>
@@ -196,23 +197,27 @@ export function RunPanel() {
                   />
                 ))
             : null}
-          {automataKind === "pda"
-            ? live
-                .slice(0, 4)
-                .map((config) => (
-                  <StackView
-                    key={config.id}
-                    config={config}
-                    symbols={symbols}
-                  />
-                ))
-            : null}
-          {automataKind === "dfa" && symbols.length > 0 && (live[0] || finished) ? (
+          {(automataKind === "dfa" || automataKind === "pda") &&
+          symbols.length > 0 &&
+          (live[0] || finished) ? (
             <InputCursor
               symbols={symbols}
               cursor={live[0]?.cursor ?? symbols.length}
             />
           ) : null}
+          {automataKind === "pda" && live.length > 0
+            ? <div className="stack-section">
+                <p>Stack</p>
+                {live
+                  .map((config) => (
+                    <StackView
+                      key={config.id}
+                      config={config}
+                      label={labels.get(config.state) ?? config.state}
+                    />
+                  ))}
+              </div>
+            : null}
           {message ? (
             <p className={finished ? "run-result" : "muted"}>
               {message}
@@ -310,17 +315,10 @@ function Tape({
   );
 }
 
-function StackView({
-  config,
-  symbols,
-}: {
-  config: SimConfig;
-  symbols: string[];
-}) {
+function StackView({ config, label }: { config: SimConfig; label: string }) {
   return (
-    <div>
-      <InputCursor symbols={symbols} cursor={config.cursor} />
-      <p className="muted">Stack, top at the right</p>
+    <div className="stack-view">
+      <LatexLabel className="stack-state" label={label} />
       <p className="stack">
         {config.stack.length === 0 ? (
           <span className="muted">empty</span>

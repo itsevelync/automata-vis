@@ -406,6 +406,7 @@ aside {
 }
 
 .input-cursor {
+  overflow-x: auto;
   display: flex;
   align-items: center;
   min-height: 1.4rem;
@@ -451,11 +452,27 @@ aside {
   letter-spacing: 0.05em;
 }
 
-.stack {
+.stack-section {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stack-view {
+  overflow-x: auto;
+  display: flex;
+  gap: 0.35rem;
+}
+
+.stack {
+  border: solid #00000094;
+  border-width: 1px 0 1px 1px;
+  display: flex;
+  padding: 0.25rem 1rem 0.25rem 0.25rem;
+  font-size: 0.6rem;
   gap: 0.25rem;
   margin: 0;
+  width: fit-content;
 }
 
 .state-paths {
@@ -547,6 +564,14 @@ aside {
 
 .muted {
   color: #5c5c5c;
+}
+
+.stack-state {
+  margin-right: 0.35rem;
+}
+
+.stack-state .katex {
+  font-size: 0.8rem;
 }
 
 .error {

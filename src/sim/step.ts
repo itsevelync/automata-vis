@@ -145,8 +145,8 @@ function closeEpsilon(
   const queue = [...seeds];
   while (queue.length > 0) {
     const current = byId.get(queue.shift()!);
-    if (!current || current.outcome !== "open") continue;
-    frontier.push(current.id);
+    if (!current) continue;
+    if (current.outcome === "open") frontier.push(current.id);
     const silent = applicable(bySource.get(current.state) ?? [], machine, symbols, current).filter(
       (transition) => isEpsilon(transition.read),
     );
@@ -161,9 +161,8 @@ function closeEpsilon(
       }
       if (status === "seen") continue;
       if (isAccept(machine, symbols, child)) {
-        configs.push({ ...child, outcome: "accept", reason: "accepting state" });
-        byId.set(child.id, child);
-        continue;
+        child.outcome = "accept";
+        child.reason = "accepting state";
       }
       configs.push(child);
       byId.set(child.id, child);
@@ -255,8 +254,8 @@ export function stepEngine(engine: Engine, machine: Machine, symbols: string[]):
       }
       seen.add(child.key);
       if (isAccept(machine, symbols, child)) {
-        configs.push({ ...child, outcome: "accept", reason: "accepting state" });
-        continue;
+        child.outcome = "accept";
+        child.reason = "accepting state";
       }
       configs.push(child);
       byId.set(child.id, child);
@@ -264,7 +263,7 @@ export function stepEngine(engine: Engine, machine: Machine, symbols: string[]):
         const closed = closeEpsilon(machine, symbols, [child.id], configs, byId, bySource, seen, nextId);
         nextId = closed.nextId;
         nextFrontier.push(...closed.frontier);
-      } else {
+      } else if (child.outcome === "open") {
         nextFrontier.push(child.id);
       }
     }

@@ -88,6 +88,9 @@ export function compile(kind: AutomataKind, nodes: DiagramNode[], edges: Diagram
       }
       const [first, second, third] = splitTransition(line, kind).map((part) => part.trim());
       if (kind === "tm") {
+        if (isEpsilon(first)) {
+          errors.push(`Remove all ε-transitions.`);
+        }
         transitions.push({
           edgeId: edge.id,
           source: edge.source,

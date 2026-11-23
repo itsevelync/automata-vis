@@ -146,6 +146,12 @@ describe("simulator", () => {
     expect(bottom).toContain("q2");
   });
 
+  it("rejects a Turing machine epsilon transition", () => {
+    const nodes = [node("q0", { initial: true }), node("q1", { accepting: true })];
+    const edges = [edge("e1", "q0", "q1", "\\varepsilon\\to\\varepsilon,R")];
+    expect(compile("tm", nodes, edges).errors.join(" ")).toContain("ε-transition");
+  });
+
   it("requires a single initial state", () => {
     expect(compile("dfa", [node("q0"), node("q1", { accepting: true })], []).errors).toContain(
       "Mark one state as initial.",

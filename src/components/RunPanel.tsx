@@ -63,6 +63,14 @@ export function RunPanel() {
     liveStates.add(config.state);
     live.push(config);
   }
+  const acceptedStates = new Set(liveStates);
+  const accepted: SimConfig[] = [];
+  for (const config of configs) {
+    if (config.outcome !== "accept" || acceptedStates.has(config.state)) continue;
+    acceptedStates.add(config.state);
+    accepted.push(config);
+  }
+  const tapes = automataKind === "tm" ? [...live, ...accepted] : live;
   const finished =
     status === "accepted" || status === "rejected" || status === "limited";
 
@@ -162,13 +170,13 @@ export function RunPanel() {
                 }
               />
             </label>
+            <p className="muted">
+              Steps: <strong>{steps}</strong>
+            </p>
           </div>
+          {automataKind !== "tm" && <p className="muted">Note: &epsilon;-transitions are taken before the next symbol is read from the input.</p>}
           <p>Current Configuration</p>
-          <p className="muted">Note that &epsilon;-transitions are taken before the next symbol is read from the input.</p>
-          <p>
-            Steps: <strong>{steps}</strong>
-          </p>
-          <p>
+          {automataKind === "dfa" && <p>
             State:{" "}
             {live.length === 0 ? (
               <span className="muted">No states possible</span>
@@ -183,15 +191,18 @@ export function RunPanel() {
                 />
               ))
             )}
-          </p>
+          </p>}
           </>
           ) : null}
           {automataKind === "tm"
-            ? live.map((config) => (
+            ? tapes.map((config) => (
                 <Tape
                   key={config.id}
                   config={config}
                   label={labels.get(config.state) ?? config.state}
+                  note={
+                    config.outcome === "accept" ? `(accepted after ${config.steps} step${config.steps === 1 ? "" : "s"})` : undefined
+                  }
                   inputLength={symbols.length}
                 />
               ))
@@ -204,9 +215,9 @@ export function RunPanel() {
               cursor={live[0]?.cursor ?? symbols.length}
             />
           ) : null}
-          {automataKind === "pda" && live.length > 0
+          {automataKind === "pda" && symbols.length > 0
             ? <div className="stack-section">
-                <p>Stack</p>
+                <p>State + Stack {live.length === 0 && <span className="muted">No states possible</span>}</p>
                 {live
                   .map((config) => (
                     <StackView
@@ -261,10 +272,12 @@ function InputCursor({
 function Tape({
   config,
   label,
+  note,
   inputLength,
 }: {
   config: SimConfig;
   label: string;
+  note?: string;
   inputLength: number;
 }) {
   const tapeRef = useRef<HTMLDivElement>(null);
@@ -296,7 +309,10 @@ function Tape({
   }, [config.head, cells.length]);
   return (
     <div className="tape-view">
-      <LatexLabel className="tape-state" label={label} />
+      <span>
+        <LatexLabel className="tape-state" label={label} />
+        {note ? <span className="muted"> {note}</span> : null}
+      </span>
       <div className="tape" aria-label="Tape" ref={tapeRef}>
       <span className="tape-ellipsis">...</span>
       {cells.map((index) => (
@@ -322,7 +338,7 @@ function Tape({
 function StackView({ config, label }: { config: SimConfig; label: string }) {
   return (
     <div className="stack-view">
-      <LatexLabel className="stack-state" label={label} />
+      <LatexLabel className="stack-state" label={label+":"} />
       <p className="stack">
         {config.stack.length === 0 ? (
           <span className="muted">empty</span>

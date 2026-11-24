@@ -486,10 +486,11 @@ aside {
   border-width: 1px 0 1px 1px;
   display: flex;
   padding: 0.25rem 1rem 0.25rem 0.25rem;
-  font-size: 0.6rem;
+  font-size: 0.8rem;
   gap: 0.25rem;
   margin: 0;
   width: fit-content;
+  min-height: 1.65rem;
 }
 
 .state-paths {
@@ -586,11 +587,6 @@ aside {
 .stack-state,
 .tape-state {
   margin-right: 0.35rem;
-}
-
-.stack-state .katex,
-.tape-state .katex {
-  font-size: 0.8rem;
 }
 
 .error {

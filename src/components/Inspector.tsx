@@ -101,7 +101,7 @@ function NodeInspector({
         />
         Accepting
       </label>
-      <button type="button" onClick={() => deleteNode(node.id)}>
+      <button type="button" className="delete" onClick={() => deleteNode(node.id)}>
         Delete state
       </button>
     </section>
@@ -213,7 +213,7 @@ function EdgeInspector({
         </label>
       )}
       {edge.bend ? <BendAngle edge={edge} updateEdge={updateEdge} /> : null}
-      <button type="button" onClick={() => deleteEdge(edge.id)}>
+      <button type="button" className="delete" onClick={() => deleteEdge(edge.id)}>
         Delete edge
       </button>
     </section>
@@ -282,7 +282,7 @@ function LabelFields({
             )}
           </label>
           {index > 0 ? (
-            <button type="button" onClick={() => onChange(lines.filter((_, item) => item !== index))}>
+            <button type="button" className="delete" onClick={() => onChange(lines.filter((_, item) => item !== index))}>
               Delete
             </button>
           ) : null}

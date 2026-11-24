@@ -42,6 +42,12 @@ button:hover {
   background: #efe2cc;
 }
 
+button.delete {
+  border: 1px solid #b40c08;
+  color: #b40c08;
+  background-color: #b634320A;
+}
+
 p {
   margin-top: 0;
 }
@@ -587,7 +593,7 @@ aside {
 }
 
 .error {
-  color: #9a3412;
+  color: #b40c08;
 }
 
 .export-panel {
@@ -708,13 +714,13 @@ aside {
 }
 
 .state-node.selected {
-  border-color: #9a3412;
+  border-color: #b40c08;
 }
 
 .state-node.accepting.selected {
   box-shadow:
     inset 0 0 0 var(--double-gap, 0.8px) #ffffff,
-    inset 0 0 0 var(--double-ring, 1.6px) #9a3412;
+    inset 0 0 0 var(--double-ring, 1.6px) #b40c08;
 }
 
 .state-label {

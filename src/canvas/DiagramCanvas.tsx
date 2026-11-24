@@ -424,7 +424,7 @@ export function DiagramCanvas() {
               refY="5"
               orient="auto"
             >
-              <path d="M0 0 L12 5 L0 10 L3.2 5 Z" fill="#9a3412" />
+              <path d="M0 0 L12 5 L0 10 L3.2 5 Z" fill="#b40c08" />
             </marker>
             <marker
               id="automata-stealth-active"
@@ -475,7 +475,7 @@ export function DiagramCanvas() {
                         ? "url(#automata-stealth-selected)"
                         : "url(#automata-stealth)"
                   }
-                  stroke={active ? "#006ae5" : selected ? "#9a3412" : "#000000"}
+                  stroke={active ? "#006ae5" : selected ? "#b40c08" : "#000000"}
                   strokeWidth={EDGE_STROKE}
                 />
               </g>

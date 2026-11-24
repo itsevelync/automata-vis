@@ -78,7 +78,7 @@ export function Header() {
       >
         <p>Changing the automata type will delete the current state machine.</p>
         <div className="modal-actions">
-          <button type="button" onClick={() => setPendingKind(null)}>
+          <button type="button" className="delete" onClick={() => setPendingKind(null)}>
             Cancel
           </button>
           <button type="button" onClick={confirmKind}>

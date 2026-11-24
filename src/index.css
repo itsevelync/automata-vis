@@ -311,7 +311,7 @@ aside {
 
 .panel h2 {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -324,7 +324,7 @@ aside {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
 }
 
 .edge-ends {
@@ -342,11 +342,6 @@ aside {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
-}
-
-.symbol-row {
-  display: flex;
-  gap: 0.35rem;
 }
 
 .symbol-button {
@@ -433,7 +428,7 @@ aside {
 }
 
 .input-cursor .cursor {
-  box-shadow: inset 2px 0 0 #1d4ed8;
+  box-shadow: inset 2px 0 0 #006ae5;
   padding-left: 0.2rem;
 }
 
@@ -443,7 +438,7 @@ aside {
   height: 1.1em;
   padding: 0;
   box-shadow: none;
-  background: #1d4ed8;
+  background: #006ae5;
   vertical-align: middle;
 }
 
@@ -461,8 +456,8 @@ aside {
 }
 
 .tape-cell.head {
-  border-color: #1d4ed8;
-  background: #1d4ed811;
+  border-color: #006ae5;
+  background: #006ae511;
 }
 
 .tape-ellipsis {
@@ -579,7 +574,7 @@ aside {
 .muted,
 .error {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
 }
 
 .muted {
@@ -697,15 +692,15 @@ aside {
 }
 
 .state-node.active {
-  border-color: #1d4ed8;
-  box-shadow: 0 0 0 3px #1d4ed833;
+  border-color: #006ae5;
+  box-shadow: 0 0 0 3px #006ae533;
 }
 
 .state-node.accepting.active {
   box-shadow:
     inset 0 0 0 var(--double-gap, 0.8px) #ffffff,
-    inset 0 0 0 var(--double-ring, 1.6px) #1d4ed8,
-    0 0 0 3px #1d4ed833;
+    inset 0 0 0 var(--double-ring, 1.6px) #006ae5,
+    0 0 0 3px #006ae533;
 }
 
 .canvas-wrap.running .state-node {

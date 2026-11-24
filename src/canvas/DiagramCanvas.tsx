@@ -436,7 +436,7 @@ export function DiagramCanvas() {
               refY="5"
               orient="auto"
             >
-              <path d="M0 0 L12 5 L0 10 L3.2 5 Z" fill="#1d4ed8" />
+              <path d="M0 0 L12 5 L0 10 L3.2 5 Z" fill="#006ae5" />
             </marker>
           </defs>
           {grid.vertical.map((x) => (
@@ -475,7 +475,7 @@ export function DiagramCanvas() {
                         ? "url(#automata-stealth-selected)"
                         : "url(#automata-stealth)"
                   }
-                  stroke={active ? "#1d4ed8" : selected ? "#9a3412" : "#000000"}
+                  stroke={active ? "#006ae5" : selected ? "#9a3412" : "#000000"}
                   strokeWidth={EDGE_STROKE}
                 />
               </g>

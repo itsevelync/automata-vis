@@ -122,7 +122,7 @@ function EdgeInspector({
   const isLoop = edge.source === edge.target || edge.loop !== undefined;
   return (
     <section className="panel">
-      <h2>Edge</h2>
+      <h2>Transition</h2>
       <div className="edge-ends">
         <p className="muted">
           {edge.source} → {isLoop ? edge.source : edge.target}
@@ -226,12 +226,6 @@ const LABEL_CAPTIONS: Record<AutomataKind, string> = {
   pda: "input, pop → push",
 };
 
-const LABEL_SYMBOLS = [
-  { command: "\\varepsilon", label: "\\varepsilon" },
-  { command: "\\to", label: "\\to" },
-  { command: "\\textvisiblespace", label: "\\textvisiblespace" },
-];
-
 function LabelFields({
   lines,
   placeholder,
@@ -245,8 +239,8 @@ function LabelFields({
   format?: "plain" | TransitionKind;
   onChange: (lines: string[]) => void;
 }) {
+  const selectionKind = useDiagram((state) => state.selection)?.kind ?? "";
   const inputs = useRef<Record<string, HTMLInputElement | null>>({});
-  const [focused, setFocused] = useState({ line: 0, part: 0 });
 
   function fieldKey(index: number, part = 0) {
     return `${index}:${part}`;
@@ -258,52 +252,8 @@ function LabelFields({
     onChange(next);
   }
 
-  function insert(command: string) {
-    const index = Math.min(focused.line, lines.length - 1);
-    const part = format === "plain" ? 0 : focused.part;
-    const input = inputs.current[fieldKey(index, part)];
-    const glyph = labelToInput(command);
-    if (format === "plain") {
-      const shown = labelToInput(lines[index] ?? "");
-      const start = input?.selectionStart ?? shown.length;
-      const end = input?.selectionEnd ?? shown.length;
-      writeLine(index, inputToLabel(shown.slice(0, start) + glyph + shown.slice(end)));
-      placeCursor(index, 0, start + glyph.length);
-      return;
-    }
-    const parts = splitTransition(lines[index] ?? "", format);
-    const shown = labelToInput(parts[part] ?? "");
-    const start = input?.selectionStart ?? shown.length;
-    const end = input?.selectionEnd ?? shown.length;
-    parts[part] = inputToLabel(shown.slice(0, start) + glyph + shown.slice(end));
-    writeLine(index, joinTransition(parts, format));
-    placeCursor(index, part, start + glyph.length);
-  }
-
-  function placeCursor(index: number, part: number, cursor: number) {
-    requestAnimationFrame(() => {
-      const element = inputs.current[fieldKey(index, part)];
-      element?.focus();
-      element?.setSelectionRange(cursor, cursor);
-    });
-  }
-
   return (
     <div className="label-lines">
-      <div className="symbol-row">
-        {LABEL_SYMBOLS.map((symbol) => (
-          <button
-            key={symbol.command}
-            type="button"
-            className="symbol-button"
-            aria-label={symbol.command}
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={() => insert(symbol.command)}
-          >
-            <LatexLabel className="symbol-math" label={symbol.label} />
-          </button>
-        ))}
-      </div>
       {lines.map((line, index) => (
         <div className="label-line" key={index}>
           <label htmlFor={`label-${index}`}>
@@ -317,7 +267,6 @@ function LabelFields({
                 }}
                 value={labelToInput(line)}
                 placeholder={caption || index === 0 ? placeholder : ""}
-                onFocus={() => setFocused({ line: index, part: 0 })}
                 onChange={(event) => writeLine(index, inputToLabel(event.target.value))}
               />
             ) : (
@@ -325,7 +274,6 @@ function LabelFields({
                 line={line}
                 kind={format}
                 placeholder={placeholder}
-                onFocus={(part) => setFocused({ line: index, part })}
                 onChange={(value) => writeLine(index, value)}
                 inputRef={(part, element) => {
                   inputs.current[fieldKey(index, part)] = element;
@@ -340,9 +288,9 @@ function LabelFields({
           ) : null}
         </div>
       ))}
-      <button type="button" onClick={() => onChange([...lines, ""])}>
-        Add label
-      </button>
+      {selectionKind !== "node" && <button type="button" onClick={() => onChange([...lines, ""])}>
+        {format === "plain" ? "Add symbol" : "Add rule"}
+      </button>}
     </div>
   );
 }
@@ -366,14 +314,12 @@ function TransitionFields({
   line,
   kind,
   placeholder,
-  onFocus,
   onChange,
   inputRef,
 }: {
   line: string;
   kind: TransitionKind;
   placeholder: string;
-  onFocus: (part: 0 | 1 | 2) => void;
   onChange: (value: string) => void;
   inputRef: (part: 0 | 1 | 2, element: HTMLInputElement | null) => void;
 }) {
@@ -405,7 +351,6 @@ function TransitionFields({
         aria-label={field.name}
         value={labelToInput(parts[field.part])}
         placeholder={kind === "tm" ? "\u2423" : placeholder}
-        onFocus={() => onFocus(field.part)}
         onChange={(event) => update(field.part, event.target.value)}
       />
     ),

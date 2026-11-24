@@ -112,6 +112,7 @@ export function RunPanel() {
               <button
                 type="button"
                 title="Restart"
+                disabled={history.length === 0}
                 onClick={stop}
               >
                 <MdReplay />

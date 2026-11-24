@@ -365,18 +365,11 @@ export function DiagramCanvas() {
       </div>
       <Modal open={modal === "help"} title="Help" onClose={() => setModal(null)}>
         <ul className="help-list">
-          <li>Double-click the grid to add a state.</li>
-          <li>Click a state or edge to select it. Click empty space to clear the selection.</li>
-          <li>Hold Shift and click a state, including the selected one, to add an edge.</li>
-          <li>Select a state or edge, then press Delete or Backspace to remove it.</li>
-          <li>Drag a state to move it. It snaps to the grid.</li>
-          <li>Drag the background to pan. Scroll or pinch on the canvas to zoom.</li>
-          <li>Use the sidebar to edit labels, initial and accepting marks, and edge direction.</li>
-          <li>Defaults changes the node distance. It rescales the grid and does not move cells.</li>
-          <li>Add label adds another symbol. DFA/NFA symbols are comma-separated. PDA and TM lines become a centered array.</li>
-          <li>The symbol buttons insert \varepsilon, \to, and \textvisiblespace.</li>
-          <li>Swap reverses an edge.</li>
-          <li>Run steps the diagram on an input. Build is read-only while running.</li>
+          <li>Add a state &mdash; Double-click the grid.</li>
+          <li>Move a state &mdash; Click to select, then drag it.</li>
+          <li>Add an edge &mdash; Hold <span className="code">Shift</span> with a state selected and select a second state.</li>
+          <li>Edit a state or edge &mdash; Select it and edit using the sidebar.</li>
+          <li>Delete a state or edge &mdash; Select it and press <span className="code">Delete</span> or <span className="code">Backspace</span>.</li>
         </ul>
       </Modal>
       <Modal open={modal === "defaults"} title="Defaults" onClose={() => setModal(null)}>

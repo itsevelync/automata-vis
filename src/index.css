@@ -60,6 +60,10 @@ p {
   overflow: hidden;
 }
 
+.code {
+  font-family: monospace;
+}
+
 header {
   grid-column: 1 / -1;
   display: flex;

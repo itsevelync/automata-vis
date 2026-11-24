@@ -395,9 +395,13 @@ aside {
 }
 
 .run-controls {
+  margin-top: 0.35rem;
   display: flex;
-  flex-wrap: wrap;
   gap: 0.35rem;
+}
+
+.run-controls button {
+  width: 100%;
 }
 
 .panel .speed-control {
@@ -413,12 +417,10 @@ aside {
 
 .run-result {
   margin: 0;
-  font-weight: 700;
 }
 
 .run-result span {
   text-decoration: underline;
-  font-weight: normal;
   cursor: pointer;
 }
 

@@ -5,7 +5,7 @@ import { INPUT_CAP, compile, BLANK } from "../sim/compile";
 import type { SimConfig } from "../sim/step";
 import { useDiagram } from "../store/diagram";
 import { useRun } from "../store/run";
-import { MdPause, MdPlayArrow, MdSkipNext, MdSkipPrevious } from "react-icons/md";
+import { MdFastForward, MdPause, MdPlayArrow, MdReplay, MdSkipNext, MdSkipPrevious } from "react-icons/md";
 
 export function RunPanel() {
   const automataKind = useDiagram((state) => state.automataKind);
@@ -97,6 +97,7 @@ export function RunPanel() {
           </label>
           <button
             type="button"
+            title={status === "idle" ? "Load input" : "Edit input"}
             onClick={status === "idle" ? load : reset}
             disabled={status === "idle" && machine.errors.length > 0}
           >
@@ -109,12 +110,14 @@ export function RunPanel() {
             <div className="run-controls">
               <button
                 type="button"
+                title="Restart"
                 onClick={stop}
               >
-                Reset
+                <MdReplay />
               </button>
               <button
                 type="button"
+                title="Step backwards"
                 onClick={back}
                 disabled={history.length === 0 || status === "running"}
               >
@@ -122,20 +125,20 @@ export function RunPanel() {
               </button>
               <button
                 type="button"
-                onClick={play}
-                disabled={status !== "ready" && status !== "paused" && !finished}
+                title={status === "running" ? "Pause" : "Play"}
+                onClick={status === "running" ? pause : play}
+                disabled={
+                  status !== "running" &&
+                  status !== "ready" &&
+                  status !== "paused" &&
+                  !finished
+                }
               >
-                <MdPlayArrow />
+                {status === "running" ? <MdPause /> : <MdPlayArrow />}
               </button>
               <button
                 type="button"
-                onClick={pause}
-                disabled={status !== "running"}
-              >
-                <MdPause />
-              </button>
-              <button
-                type="button"
+                title="Step forward"
                 onClick={step}
                 disabled={status !== "ready" && status !== "paused"}
               >
@@ -143,6 +146,7 @@ export function RunPanel() {
               </button>
               <button
                 type="button"
+                title="Skip to end"
                 onClick={skip}
                 disabled={
                   status !== "ready" &&
@@ -150,7 +154,7 @@ export function RunPanel() {
                   status !== "running"
                 }
               >
-                Skip
+                <MdFastForward />
               </button>
             </div>
             <div className="run-controls">
@@ -228,19 +232,18 @@ export function RunPanel() {
                   ))}
               </div>
             : null}
-          {message ? (
-            <p className={finished ? "run-result" : "muted"}>
-              {message}
-              {finished && <>{" "}<span onClick={() => setTraceOpen(true)}>(Open decision tree)</span></>}
-              <Modal
-                open={traceOpen}
-                title="Decision tree"
-                onClose={() => setTraceOpen(false)}
-              >
-                <Trace configs={configs} labels={labels} />
-              </Modal>
-            </p>
-          ) : null}
+          {message && !finished && <p className="muted">{message}</p>}
+          {message && finished && <p className="run-result">
+            <b>{message}</b>{" "}
+            (<span onClick={() => setTraceOpen(true)}>Open decision tree</span>)
+            <Modal
+              open={traceOpen}
+              title="Decision tree"
+              onClose={() => setTraceOpen(false)}
+            >
+              <Trace configs={configs} labels={labels} />
+            </Modal>
+          </p>}
         </>
       )}
     </section>

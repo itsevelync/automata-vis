@@ -59,10 +59,11 @@ export function DefaultsForm() {
   const units = LENGTH_UNITS.includes(unit) ? LENGTH_UNITS : [unit, ...LENGTH_UNITS];
   return (
     <section className="panel">
-      <label>
+      <label htmlFor="node-distance">
         Node distance
         <span className="distance-field">
           <input
+            id="node-distance"
             type="number"
             min="0"
             step="any"
@@ -78,6 +79,7 @@ export function DefaultsForm() {
             onBlur={() => commit(magnitude, unit)}
           />
           <select
+            id="node-distance-unit"
             aria-label="Node distance unit"
             value={unit}
             onChange={(event) => {

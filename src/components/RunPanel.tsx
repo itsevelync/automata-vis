@@ -82,9 +82,10 @@ export function RunPanel() {
       ) : (
         <>
           <p className="muted">Load an input, then step or play.</p>
-          <label>
+          <label htmlFor="automata-input">
             Input
             <input
+              id="automata-input"
               ref={inputRef}
               value={input}
               maxLength={INPUT_CAP}

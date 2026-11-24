@@ -36,7 +36,7 @@ export function ExportPanel() {
           {copied === "preamble" ? "Copied" : "Copy"}
         </button>
       </div>
-      <textarea className="tikz-preamble" readOnly value={TIKZ_PREAMBLE} spellCheck={false} rows={2} />
+      <textarea id="tikz-preamble" className="tikz-preamble" readOnly value={TIKZ_PREAMBLE} spellCheck={false} rows={2} />
       <div className="panel-head">
         <h2>State Diagram</h2>
         <button
@@ -51,7 +51,7 @@ export function ExportPanel() {
           {copied === "tikz" ? "Copied" : "Copy"}
         </button>
       </div>
-      <textarea readOnly value={tikz} spellCheck={false} />
+      <textarea id="tikz-code" readOnly value={tikz} spellCheck={false} />
     </section>
   );
 }

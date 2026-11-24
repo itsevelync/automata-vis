@@ -54,9 +54,10 @@ export function Header() {
             Run
           </button>
         </div>
-        <label className="automata-kind">
+        <label htmlFor="automata-type" className="automata-kind">
         Type
         <select
+          id="automata-type"
           aria-label="Automata type"
           value={automataKind}
           onChange={(event) => requestKind(event.target.value as AutomataKind)}

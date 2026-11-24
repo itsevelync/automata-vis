@@ -66,9 +66,10 @@ function NodeInspector({
   return (
     <section className="panel">
       <h2>State</h2>
-      <label>
+      <label htmlFor="state-id">
         Id
         <input
+          id="state-id"
           value={idDraft}
           onChange={(event) => setIdDraft(event.target.value)}
           onBlur={() => {
@@ -82,16 +83,18 @@ function NodeInspector({
         placeholder="q_1"
         onChange={(lines) => updateNode(node.id, { lines, label: joinLabels(lines) })}
       />
-      <label className="check">
+      <label htmlFor="initial-checkbox" className="check">
         <input
+          id="initial-checkbox"
           type="checkbox"
           checked={Boolean(node.initial)}
           onChange={(event) => updateNode(node.id, { initial: event.target.checked })}
         />
         Initial
       </label>
-      <label className="check">
+      <label htmlFor="accepting-checkbox" className="check">
         <input
+          id="accepting-checkbox"
           type="checkbox"
           checked={Boolean(node.accepting)}
           onChange={(event) => updateNode(node.id, { accepting: event.target.checked })}
@@ -147,9 +150,10 @@ function EdgeInspector({
           updateEdge(edge.id, { lines, label: displayEdgeLabel(lines, automataKind) })
         }
       />
-      <label>
+      <label htmlFor="label-side">
         Label side
         <select
+          id="label-side"
           value={edge.labelPos?.side ?? ""}
           onChange={(event) => {
             const side = event.target.value as Side | "";
@@ -172,9 +176,10 @@ function EdgeInspector({
       </label>
       {edge.labelPos ? <LabelDistance edge={edge} updateEdge={updateEdge} /> : null}
       {isLoop ? (
-        <label>
+        <label htmlFor="loop-side">
           Loop side
           <select
+            id="loop-side"
             value={edge.loop ?? "right"}
             onChange={(event) =>
               updateEdge(edge.id, { loop: event.target.value as Side, bend: undefined })
@@ -188,9 +193,10 @@ function EdgeInspector({
           </select>
         </label>
       ) : (
-        <label>
+        <label htmlFor="bend">
           Bend
           <select
+            id="bend"
             value={edge.bend ?? ""}
             onChange={(event) => {
               const bend = event.target.value as Bend | "";
@@ -300,11 +306,12 @@ function LabelFields({
       </div>
       {lines.map((line, index) => (
         <div className="label-line" key={index}>
-          <label>
+          <label htmlFor={`label-${index}`}>
             {index === 0 ? "Label" : ""}
             {index === 0 && caption ? <span className="label-caption">{caption}</span> : null}
             {format === "plain" ? (
               <input
+                id={`label-${index}`}
                 ref={(element) => {
                   inputs.current[fieldKey(index)] = element;
                 }}
@@ -437,9 +444,10 @@ function BendAngle({
   const [draft, setDraft] = useState(edge.bendAngle?.toString() ?? "");
   useEffect(() => setDraft(edge.bendAngle?.toString() ?? ""), [edge.bendAngle, edge.id]);
   return (
-    <label>
+    <label htmlFor="bend-angle">
       Bend angle
       <input
+        id="bend-angle"
         value={draft}
         placeholder="30"
         onChange={(event) => setDraft(event.target.value)}
@@ -508,10 +516,11 @@ function LabelDistance({
 
   const units = LENGTH_UNITS.includes(unit) ? LENGTH_UNITS : [unit, ...LENGTH_UNITS];
   return (
-    <label>
+    <label htmlFor="label-distance">
       Label distance
       <span className="distance-field">
         <input
+          id="label-distance"
           type="number"
           min="0"
           step="any"
@@ -526,6 +535,7 @@ function LabelDistance({
           onBlur={() => commit(magnitude, unit)}
         />
         <select
+          id="label-distance-unit"
           aria-label="Label distance unit"
           value={unit}
           onChange={(event) => {

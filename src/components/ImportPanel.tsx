@@ -12,7 +12,7 @@ export function ImportPanel({ onImported }: { onImported: () => void }) {
       <textarea
         value={source}
         spellCheck={false}
-        placeholder="Paste a tikzpicture"
+        placeholder="Paste a tikzpicture for your state diagram."
         onChange={(event) => {
           setSource(event.target.value);
           setError("");

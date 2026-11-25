@@ -144,6 +144,7 @@ function EdgeInspector({
       <LabelFields
         lines={edge.lines ?? [edge.label ?? ""]}
         placeholder="ε"
+        maxLength={1}
         caption={LABEL_CAPTIONS[automataKind]}
         format={automataKind === "dfa" ? "plain" : automataKind}
         onChange={(lines) =>
@@ -229,12 +230,14 @@ const LABEL_CAPTIONS: Record<AutomataKind, string> = {
 function LabelFields({
   lines,
   placeholder,
+  maxLength,
   caption,
   format = "plain",
   onChange,
 }: {
   lines: string[];
   placeholder: string;
+  maxLength?: number;
   caption?: string;
   format?: "plain" | TransitionKind;
   onChange: (lines: string[]) => void;
@@ -266,7 +269,7 @@ function LabelFields({
                   inputs.current[fieldKey(index)] = element;
                 }}
                 value={labelToInput(line)}
-                maxLength={1}
+                maxLength={maxLength}
                 placeholder={caption || index === 0 ? placeholder : ""}
                 onChange={(event) => writeLine(index, inputToLabel(event.target.value))}
               />

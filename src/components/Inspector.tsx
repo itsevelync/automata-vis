@@ -266,6 +266,7 @@ function LabelFields({
                   inputs.current[fieldKey(index)] = element;
                 }}
                 value={labelToInput(line)}
+                maxLength={1}
                 placeholder={caption || index === 0 ? placeholder : ""}
                 onChange={(event) => writeLine(index, inputToLabel(event.target.value))}
               />
@@ -350,6 +351,7 @@ function TransitionFields({
         ref={(element) => inputRef(field.part, element)}
         aria-label={field.name}
         value={labelToInput(parts[field.part])}
+        maxLength={1}
         placeholder={kind === "tm" ? "\u2423" : placeholder}
         onChange={(event) => update(field.part, event.target.value)}
       />

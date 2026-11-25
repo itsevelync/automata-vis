@@ -33,7 +33,7 @@ input:disabled {
 }
 
 button {
-  border: 1px solid #000000;
+  border: 1px solid #00000050;
   padding: 0.35rem 0.7rem;
   cursor: pointer;
 }
@@ -182,11 +182,17 @@ header p {
   gap: 0.3rem;
 }
 
+.canvas-controls button {
+  padding: 0.35rem 0.5rem;
+}
+
+.toolbar button,
 .canvas-controls button,
 .run-controls button {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.35rem;
 }
 
 .state-anchor {
@@ -204,35 +210,40 @@ header p {
   gap: 0.4rem;
 }
 
-.example-menu {
+.toolbar .divider {
+  border-right: solid 1px #00000030;
+  margin: 0 0.35rem;
+}
+
+.toolbar .example-menu {
   position: relative;
 }
 
-.example-select {
+.toolbar .example-select {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.35rem;
-  width: 11rem;
+  width: 12rem;
   border: 1px solid #0000002b;
   background: #ffffff;
   padding: 0.35rem 0.3rem 0.35rem 0.45rem;
   color: #5c5c5c;
 }
 
-.example-select.chosen {
+.toolbar .example-select.chosen {
   color: #000000;
 }
 
-.example-select:hover {
+.toolbar .example-select:hover {
   background: #ffffff;
 }
 
-.example-menu.open .example-select {
+.toolbar .example-menu.open .example-select {
   border-bottom-color: #0000002b;
 }
 
-.example-options {
+.toolbar .example-options {
   position: absolute;
   z-index: 6;
   top: 100%;
@@ -245,9 +256,9 @@ header p {
   border-top: 1px solid #0000002b;
 }
 
-.example-options button {
+.toolbar .example-options button {
   padding: 0.28rem 0.45rem;
-  text-align: left;
+  justify-content: space-between;
   background: #ffffff;
   border: none;
   font-size: 0.8rem;
@@ -255,28 +266,30 @@ header p {
   color: #000000;
 }
 
-.example-options .example-placeholder {
+.toolbar .example-options .example-placeholder {
   color: #5c5c5c;
   font-size: 1rem;
   font-style: normal;
   cursor: default;
 }
 
-.example-options .example-placeholder:hover {
+.toolbar .example-options .example-placeholder:hover {
   background: #ffffff;
 }
 
-.example-options button.active,
-.example-options button:hover {
+.toolbar .example-options button.active,
+.toolbar .example-options button:hover {
   background: #efe2cc;
 }
 
-.example-math {
+.toolbar .example-math {
+  flex: 1;
+  text-align: left;
   font-style: normal;
   font-size: 0.8rem;
 }
 
-.example-reset {
+.toolbar .example-reset {
   position: absolute;
   top: calc(100% + 0.25rem);
   left: 0;
@@ -287,7 +300,7 @@ header p {
   font-size: 0.8rem;
 }
 
-.example-reset .inline-center {
+.toolbar .example-reset .inline-center {
   display: inline-block;
   vertical-align: middle;
   margin-bottom: 0.12rem;

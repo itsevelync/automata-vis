@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { formatLength, formatMagnitude, parseLength } from "../model/length";
 import { useDiagram } from "../store/diagram";
 
+const DEFAULT_NODE_DISTANCE = "3";
 const LENGTH_UNITS = ["cm", "mm", "pt", "em", "ex", "in"];
 
 function distanceParts(distance: string): { magnitude: string; unit: string } {
@@ -26,13 +27,9 @@ export function DefaultsForm() {
   }, [nodeDistance]);
 
   function commit(nextMagnitude: string, nextUnit: string) {
-    const value = nextMagnitude.trim();
+    let value = nextMagnitude.trim();
     if (!value) {
-      setInvalid(true);
-      const current = distanceParts(nodeDistance);
-      setMagnitude(current.magnitude);
-      setUnit(current.unit);
-      return;
+      value = DEFAULT_NODE_DISTANCE
     }
     const amount = Number(value);
     if (!Number.isFinite(amount) || amount <= 0) {
@@ -68,7 +65,7 @@ export function DefaultsForm() {
             min="0"
             step="any"
             value={magnitude}
-            placeholder="3"
+            placeholder={DEFAULT_NODE_DISTANCE}
             onChange={(event) => {
               const next = event.target.value;
               setMagnitude(next);
@@ -97,7 +94,7 @@ export function DefaultsForm() {
         </span>
       </label>
       {invalid ? <p className="error">Use one positive length, such as 3cm.</p> : null}
-      <p className="muted">Center-to-center. Changing it rescales the grid and does not move cells.</p>
+      <p className="muted">Distance between nodes.</p>
     </section>
   );
 }

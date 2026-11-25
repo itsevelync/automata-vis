@@ -12,7 +12,7 @@ import { PT_PX, cellSizePx, centerToCell } from "./geometry";
 import { LatexLabel } from "./LatexLabel";
 import { StateNode } from "./StateNode";
 import { curvePath } from "./tikzPath";
-import { MdAdd, MdArrowDropDown, MdBuild, MdHome, MdQuestionMark, MdRefresh, MdRemove } from "react-icons/md";
+import { MdAdd, MdArrowDropDown, MdBuild, MdCode, MdHome, MdQuestionMark, MdRefresh, MdRemove } from "react-icons/md";
 import { RiEraserFill } from "react-icons/ri";
 
 type View = { x: number; y: number; zoom: number };
@@ -150,7 +150,7 @@ export function DiagramCanvas() {
 
   function onPointerDown(event: React.PointerEvent) {
     if (!wrapRef.current?.contains(event.target as Node)) return;
-    if ((event.target as HTMLElement).closest(".state-node, .edge-label, .toolbar, .canvas-controls")) {
+    if ((event.target as HTMLElement).closest(".state-node, .edge-label, .toolbar, .canvas-controls, .modal")) {
       return;
     }
     event.preventDefault();
@@ -220,7 +220,7 @@ export function DiagramCanvas() {
 
   function onDoubleClick(event: React.MouseEvent) {
     if (useSession.getState().mode === "run") return;
-    if ((event.target as HTMLElement).closest(".state-node, .toolbar, .canvas-controls")) return;
+    if ((event.target as HTMLElement).closest(".state-node, .toolbar, .canvas-controls, .modal")) return;
     const point = flowPoint(event.clientX, event.clientY);
     const cell = centerToCell(point.x, point.y, cellPx);
     addNode(cell.col, cell.row);
@@ -337,6 +337,7 @@ export function DiagramCanvas() {
             </div>
           ) : null}
         </div>
+        <div className="divider"></div>
         <button
           type="button"
           title="Clear canvas"
@@ -349,18 +350,11 @@ export function DiagramCanvas() {
         >
           <RiEraserFill />
         </button>
-        {running ? null : (
-          <>
-            <button title="Canvas settings" type="button" onClick={() => setModal("defaults")}>
-              <MdBuild />
-            </button>
-            <button title="Help" type="button" onClick={() => setModal("help")}>
-              <MdQuestionMark />
-            </button>
-          </>
-        )}
+        <button title="Help" type="button" onClick={() => setModal("help")}>
+          <MdQuestionMark />
+        </button>
         <button title="Get LaTeX code" type="button" onClick={() => setModal("tikz")}>
-          Get LaTeX code
+          <i>LaTeX</i> <MdCode />
         </button>
       </div>
       <Modal open={modal === "help"} title="Help" onClose={() => setModal(null)}>
@@ -375,16 +369,24 @@ export function DiagramCanvas() {
       <Modal open={modal === "defaults"} title="Defaults" onClose={() => setModal(null)}>
         <DefaultsForm />
       </Modal>
-      <Modal open={modal === "tikz"} title="TikZ" onClose={() => setModal(null)}>
+      <Modal open={modal === "tikz"} title="LaTeX Code" onClose={() => setModal(null)}>
         <ExportPanel />
       </Modal>
       <div className="canvas-controls">
+        <button title="Canvas settings" type="button" onClick={() => setModal("defaults")}>
+          <MdBuild />
+        </button>
+        <div>
         <button type="button" title="Zoom in" onClick={() => zoomBy(1.15)}>
           <MdAdd />
         </button>
-        <button type="button" title="Zoom out" onClick={() => zoomBy(1 / 1.15)}>
+        <button
+          type="button" title="Zoom out" onClick={() => zoomBy(1 / 1.15)}
+          style={{ borderTop: "none" }}
+        >
           <MdRemove />
         </button>
+        </div>
         <button type="button" title="Fit" onClick={() => fit()}>
           <MdHome />
         </button>

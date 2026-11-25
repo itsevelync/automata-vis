@@ -52,6 +52,7 @@ export function ExportPanel() {
         </button>
       </div>
       <textarea id="tikz-code" readOnly value={tikz} spellCheck={false} />
+      <p className="muted"><i>Tip:</i> Adjust <span className="code">scale=1</span> to ensure your state diagram fits on the page.</p>
     </section>
   );
 }

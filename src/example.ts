@@ -9,7 +9,7 @@ export const dfaDiagram: Diagram = {
     { id: "q0", label: "q_0", col: 0, row: 0, initial: true },
     { id: "q1", label: "q_1", col: 1, row: 0 },
     { id: "q2", label: "q_2", col: 2, row: 0 },
-    { id: "q3", label: "q_{3}", col: 3, row: 0, accepting: true },
+    { id: "q3", label: "q_3", col: 3, row: 0, accepting: true },
   ],
   edges: [
     { id: "e1", source: "q0", target: "q0", label: "0", loop: "above" },
@@ -29,7 +29,7 @@ export const nfaEnds101Diagram: Diagram = {
     { id: "q0", label: "q_0", col: 0, row: 0, initial: true },
     { id: "q1", label: "q_1", col: 1, row: 0 },
     { id: "q2", label: "q_2", col: 2, row: 0 },
-    { id: "q3", label: "q_{3}", col: 3, row: 0, accepting: true },
+    { id: "q3", label: "q_3", col: 3, row: 0, accepting: true },
   ],
   edges: [
     { id: "e1", source: "q0", target: "q0", lines: ["0", "1"], label: "0,1", loop: "above" },

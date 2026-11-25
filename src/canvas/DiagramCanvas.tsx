@@ -398,6 +398,8 @@ export function DiagramCanvas() {
           <li>Edit a state or edge &mdash; Select it and edit using the sidebar.</li>
           <li>Delete a state or edge &mdash; Select it and press <span className="code">Delete</span> or <span className="code">Backspace</span>.</li>
         </ul>
+        <br />
+        <p className="muted"><i>Note:</i> Diagram editing is disabled in Run mode.</p>
       </Modal>
       <Modal open={modal === "defaults"} title="Defaults" onClose={() => setModal(null)}>
         <DefaultsForm />

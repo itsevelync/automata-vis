@@ -93,17 +93,36 @@ export function DiagramCanvas() {
       maxX = Math.max(maxX, x + size);
       maxY = Math.max(maxY, y + size);
     }
+    const viewport = wrap.querySelector(".viewport");
+    if (viewport) {
+      const origin = viewport.getBoundingClientRect();
+      wrap.querySelectorAll(".edge-label, .state-anchor").forEach((element) => {
+        const rect = element.getBoundingClientRect();
+        if (rect.width === 0 && rect.height === 0) return;
+        minX = Math.min(minX, (rect.left - origin.left) / view.zoom);
+        minY = Math.min(minY, (rect.top - origin.top) / view.zoom);
+        maxX = Math.max(maxX, (rect.right - origin.left) / view.zoom);
+        maxY = Math.max(maxY, (rect.bottom - origin.top) / view.zoom);
+      });
+    }
+    const padTop = 60;
+    const padBottom = 30;
+    const contentHeight = Math.max(1, maxY - minY);
     const zoom = Math.min(
       1.6,
       Math.max(
         0.25,
         Math.min((rect.width - 80) / Math.max(1, maxX - minX), (rect.height - 80) / Math.max(1, maxY - minY)),
+        Math.min(
+          (rect.width - 80) / Math.max(1, maxX - minX),
+          (rect.height - padTop - padBottom) / contentHeight,
+        ),
       ),
     );
     setView({
       zoom,
       x: (rect.width - (minX + maxX) * zoom) / 2,
-      y: (rect.height - (minY + maxY) * zoom) / 2,
+      y: padTop + (rect.height - padTop - padBottom - contentHeight * zoom) / 2 - minY * zoom,
     });
   }
 

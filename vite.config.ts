@@ -6,4 +6,5 @@ export default defineConfig({
   test: {
     environment: "node",
   },
+  base: '/automata-vis/', 
 });

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { DefaultsForm } from "../components/DefaultsForm";
 import { ExportPanel } from "../components/ExportPanel";
+import { ImportPanel } from "../components/ImportPanel";
 import { Modal } from "../components/Modal";
 import { EXAMPLES, exampleById } from "../example";
 import { AUTOMATA_KINDS } from "../model/types";
@@ -13,7 +14,7 @@ import { PT_PX, cellSizePx, centerToCell } from "./geometry";
 import { LatexLabel } from "./LatexLabel";
 import { StateNode } from "./StateNode";
 import { curvePath } from "./tikzPath";
-import { MdAdd, MdArrowDropDown, MdBuild, MdCode, MdHome, MdMenuBook, MdQuestionMark, MdRefresh, MdRemove } from "react-icons/md";
+import { MdAdd, MdArrowDropDown, MdBuild, MdCode, MdHome, MdMenuBook, MdQuestionMark, MdRefresh, MdRemove, MdUploadFile } from "react-icons/md";
 import { RiEraserFill } from "react-icons/ri";
 import Reference from "../components/Reference";
 
@@ -47,7 +48,7 @@ export function DiagramCanvas() {
   >(null);
   const [view, setView] = useState<View>({ x: 48, y: 48, zoom: 1 });
   const [panning, setPanning] = useState(false);
-  const [modal, setModal] = useState<"help" | "tikz" | "defaults" | "reference" | null>(null);
+  const [modal, setModal] = useState<"help" | "tikz" | "import" | "defaults" | "reference" | null>(null);
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [exampleId, setExampleId] = useState<string | null>(null);
   const [exampleIndex, setExampleIndex] = useState(0);
@@ -55,7 +56,7 @@ export function DiagramCanvas() {
   const examples = EXAMPLES[automataKind];
   const selectedExample = examples.find((example) => example.id === exampleId) ?? null;
   const exampleDirty = exampleId !== null && !sameExample(exampleId, nodes, edges, nodeDistance, scale);
-  const length = parseLength(nodeDistance) ?? { magnitude: 3, unit: "cm" };
+  const length = parseLength(nodeDistance ?? "") ?? { magnitude: 3, unit: "cm" };
   const cellPx = cellSizePx(length);
   const viewRef = useRef(view);
   viewRef.current = view;
@@ -358,6 +359,9 @@ export function DiagramCanvas() {
         <button title="Get LaTeX code" type="button" onClick={() => setModal("tikz")}>
           <i>LaTeX</i> <MdCode />
         </button>
+        <button title="Import LaTeX" type="button" onClick={() => setModal("import")}>
+          <MdUploadFile />
+        </button>
       </div>
       <Modal open={modal === "help"} title="Help" onClose={() => setModal(null)}>
         <ul className="help-list">
@@ -377,6 +381,15 @@ export function DiagramCanvas() {
         onClose={() => setModal(null)}
       >
         <Reference kind={automataKind} />
+      </Modal>
+      <Modal open={modal === "import"} title="Import LaTeX" onClose={() => setModal(null)}>
+        <ImportPanel
+          onImported={() => {
+            setExampleId(null);
+            setModal(null);
+            window.setTimeout(() => fit(useDiagram.getState().nodes), 0);
+          }}
+        />
       </Modal>
       <Modal open={modal === "tikz"} title="LaTeX Code" onClose={() => setModal(null)}>
         <ExportPanel />

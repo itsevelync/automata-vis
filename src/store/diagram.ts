@@ -7,6 +7,7 @@ import { parseLength } from "../model/length";
 import type {
   AutomataKind,
   Bend,
+  Diagram,
   DiagramEdge,
   DiagramNode,
   LabelPos,
@@ -41,6 +42,7 @@ interface DiagramState {
   select: (selection: Selection) => void;
   setAutomataKind: (kind: AutomataKind) => void;
   loadExample: (id?: string) => void;
+  importDiagram: (diagram: Diagram & { kind: AutomataKind }) => void;
   clear: () => void;
 }
 
@@ -190,6 +192,22 @@ export const useDiagram = create<DiagramState>((set, get) => ({
       scale: example.defaults.scale,
       selection: null,
       edgeSeq: example.edges.length + 1,
+      displaySizes: {},
+    });
+  },
+  importDiagram: ({ kind, nodes, edges, defaults }) => {
+    set({
+      automataKind: kind,
+      nodes: nodes.map((node) => ({ ...node })),
+      edges: edges.map((edge) => ({
+        ...edge,
+        ...(edge.lines ? { lines: [...edge.lines] } : {}),
+        ...(edge.labelPos ? { labelPos: { ...edge.labelPos } } : {}),
+      })),
+      nodeDistance: defaults.nodeDistance,
+      scale: defaults.scale,
+      selection: null,
+      edgeSeq: edges.length + 1,
       displaySizes: {},
     });
   },

@@ -82,16 +82,16 @@ const ARROW = "\\to";
 export function splitTransition(line: string, kind: TransitionKind): TransitionParts {
   const arrow = line.indexOf(ARROW);
   if (arrow < 0) return [line, "", ""];
-  const left = line.slice(0, arrow);
-  const right = line.slice(arrow + ARROW.length);
+  const left = line.slice(0, arrow).trim();
+  const right = line.slice(arrow + ARROW.length).trim();
   if (kind === "tm") {
     const comma = right.indexOf(",");
     if (comma < 0) return [left, right, ""];
-    return [left, right.slice(0, comma), right.slice(comma + 1)];
+    return [left, right.slice(0, comma).trim(), right.slice(comma + 1).trim()];
   }
   const comma = left.indexOf(",");
   if (comma < 0) return [left, "", right];
-  return [left.slice(0, comma), left.slice(comma + 1), right];
+  return [left.slice(0, comma).trim(), left.slice(comma + 1).trim(), right];
 }
 
 export function joinTransition(parts: TransitionParts, kind: TransitionKind): string {

@@ -14,8 +14,7 @@ import { PT_PX, cellSizePx, centerToCell } from "./geometry";
 import { LatexLabel } from "./LatexLabel";
 import { StateNode } from "./StateNode";
 import { curvePath } from "./tikzPath";
-import { downloadDiagramSvg } from "./exportSvg";
-import { MdAdd, MdArrowDropDown, MdBuild, MdCode, MdHome, MdImage, MdMenuBook, MdQuestionMark, MdRefresh, MdRemove, MdUploadFile } from "react-icons/md";
+import { MdAdd, MdArrowDropDown, MdBuild, MdCode, MdHome, MdMenuBook, MdQuestionMark, MdRefresh, MdRemove, MdUploadFile } from "react-icons/md";
 import { RiEraserFill } from "react-icons/ri";
 import Reference from "../components/Reference";
 
@@ -25,6 +24,7 @@ export function DiagramCanvas() {
   const nodes = useDiagram((state) => state.nodes);
   const edges = useDiagram((state) => state.edges);
   const nodeDistance = useDiagram((state) => state.nodeDistance);
+  const showGrid = useDiagram((state) => state.showGrid);
   const scale = useDiagram((state) => state.scale);
   const nodeSize = useDiagram((state) => state.nodeSize);
   const displaySizes = useDiagram((state) => state.displaySizes);
@@ -384,15 +384,6 @@ export function DiagramCanvas() {
         <button title="Get LaTeX code" type="button" onClick={() => setModal("tikz")}>
           <i>LaTeX</i> <MdCode />
         </button>
-        <button
-          title="Export SVG"
-          type="button"
-          onClick={() => {
-            if (wrapRef.current) downloadDiagramSvg(wrapRef.current, view.zoom);
-          }}
-        >
-          <MdImage />
-        </button>
         <button title="Import LaTeX" type="button" onClick={() => setModal("import")}>
           <MdUploadFile />
         </button>
@@ -495,12 +486,16 @@ export function DiagramCanvas() {
               <path d="M0 0 L12 5 L0 10 L3.2 5 Z" fill="#006ae5" />
             </marker>
           </defs>
-          {grid.vertical.map((x) => (
-            <line key={`v${x}`} x1={x} y1={grid.top} x2={x} y2={grid.bottom} className="grid-line" />
-          ))}
-          {grid.horizontal.map((y) => (
-            <line key={`h${y}`} x1={grid.left} y1={y} x2={grid.right} y2={y} className="grid-line" />
-          ))}
+          {showGrid
+            ? grid.vertical.map((x) => (
+                <line key={`v${x}`} x1={x} y1={grid.top} x2={x} y2={grid.bottom} className="grid-line" />
+              ))
+            : null}
+          {showGrid
+            ? grid.horizontal.map((y) => (
+                <line key={`h${y}`} x1={grid.left} y1={y} x2={grid.right} y2={y} className="grid-line" />
+              ))
+            : null}
           {edges.map((edge) => {
             const source = circles.get(edge.source);
             const target = circles.get(edge.target);

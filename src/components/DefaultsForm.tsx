@@ -8,6 +8,8 @@ const DEFAULT_NODE_DISTANCE = 3;
 export function DefaultsForm() {
   const nodeDistance = useDiagram((state) => state.nodeDistance);
   const setNodeDistance = useDiagram((state) => state.setNodeDistance);
+  const showGrid = useDiagram((state) => state.showGrid);
+  const setShowGrid = useDiagram((state) => state.setShowGrid);
   const [invalid, setInvalid] = useState(false);
 
   return (
@@ -30,7 +32,15 @@ export function DefaultsForm() {
         }}
       />
       {invalid ? <p className="error">Use one positive length, such as 3cm.</p> : null}
-      <p className="muted">Distance between nodes.</p>
+      <label className="check" htmlFor="show-grid">
+        <input
+          id="show-grid"
+          type="checkbox"
+          checked={showGrid}
+          onChange={(event) => setShowGrid(event.target.checked)}
+        />
+        Show grid lines
+      </label>
     </section>
   );
 }

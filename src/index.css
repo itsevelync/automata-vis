@@ -374,6 +374,13 @@ aside {
   font-size: 0.95rem;
 }
 
+.panel label[for="node-distance"] {
+  padding: 0 0.2rem;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.65rem;
+}
+
 .edge-ends {
   display: flex;
   align-items: center;

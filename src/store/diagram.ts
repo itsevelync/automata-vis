@@ -24,6 +24,7 @@ interface DiagramState {
   nodes: DiagramNode[];
   edges: DiagramEdge[];
   nodeDistance: string;
+  showGrid: boolean;
   nodeSize: number;
   displaySizes: Record<string, number>;
   scale: number;
@@ -38,6 +39,7 @@ interface DiagramState {
   deleteEdge: (id: string) => void;
   deleteSelection: () => void;
   setNodeDistance: (value: string) => boolean;
+  setShowGrid: (showGrid: boolean) => void;
   setDisplaySize: (id: string, size: number) => void;
   select: (selection: Selection) => void;
   setAutomataKind: (kind: AutomataKind) => void;
@@ -76,6 +78,7 @@ export const useDiagram = create<DiagramState>((set, get) => ({
   nodes: stored?.nodes ?? [],
   edges: stored?.edges ?? [],
   nodeDistance: stored?.nodeDistance ?? "3cm",
+  showGrid: stored?.showGrid !== false,
   nodeSize: DEFAULT_STATE_NODE_SIZE,
   displaySizes: {},
   scale: stored?.scale ?? 1,
@@ -186,6 +189,7 @@ export const useDiagram = create<DiagramState>((set, get) => ({
     if (selection.kind === "node") get().deleteNode(selection.id);
     else get().deleteEdge(selection.id);
   },
+  setShowGrid: (showGrid) => set({ showGrid }),
   setNodeDistance: (value) => {
     if (!parseLength(value)) return false;
     set({ nodeDistance: value.trim() });
@@ -243,6 +247,7 @@ useDiagram.subscribe((state) => {
       nodes: state.nodes,
       edges: state.edges,
       nodeDistance: state.nodeDistance,
+      showGrid: state.showGrid,
       scale: state.scale,
       edgeSeq: state.edgeSeq,
     }),

@@ -366,27 +366,29 @@ export function DiagramCanvas() {
           ) : null}
         </div>
         <div className="divider"></div>
-        <button
-          type="button"
-          title="Clear canvas"
-          onClick={() => {
-            clear();
-            setExampleId(null);
-            setExamplesOpen(false);
-            setView({ x: 48, y: 48, zoom: 1 });
-          }}
-        >
-          <RiEraserFill />
-        </button>
-        <button title="Help" type="button" onClick={() => setModal("help")}>
-          <MdQuestionMark />
-        </button>
-        <button title="Get LaTeX code" type="button" onClick={() => setModal("tikz")}>
-          <i>LaTeX</i> <MdCode />
-        </button>
-        <button title="Import LaTeX" type="button" onClick={() => setModal("import")}>
-          <MdUploadFile />
-        </button>
+        <div className="toolbar-options">
+          <button
+            type="button"
+            title="Clear canvas"
+            onClick={() => {
+              clear();
+              setExampleId(null);
+              setExamplesOpen(false);
+              setView({ x: 48, y: 48, zoom: 1 });
+            }}
+          >
+            <RiEraserFill />
+          </button>
+          <button title="Help" type="button" onClick={() => setModal("help")}>
+            <MdQuestionMark />
+          </button>
+          <button title="Get LaTeX code" type="button" onClick={() => setModal("tikz")}>
+            <i>LaTeX</i> <MdCode />
+          </button>
+          <button title="Import LaTeX" type="button" onClick={() => setModal("import")}>
+            <MdUploadFile />
+          </button>
+        </div>
       </div>
       <Modal open={modal === "help"} title="Help" onClose={() => setModal(null)}>
         <ul className="help-list">

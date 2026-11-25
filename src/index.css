@@ -69,6 +69,12 @@ ul.dash {
   overflow: hidden;
 }
 
+@media (max-width: 850px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .code {
   font-family: monospace;
 }
@@ -83,6 +89,12 @@ header {
   border-bottom: 1px solid #0000002b;
 }
 
+@media (max-width: 640px) {
+  header {
+    flex-direction: column;
+  }
+}
+
 .header-title {
   display: flex;
   align-items: baseline;
@@ -90,11 +102,28 @@ header {
   min-width: 0;
 }
 
+@media (max-width: 1024px) {
+  .header-title {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+  }
+}
+
 .header-controls {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   margin-left: auto;
+}
+
+@media (max-width: 640px) {
+  .header-controls {
+    margin-left: 0;
+    justify-content: space-between;
+    width: 100%;
+  }
 }
 
 .mode-toggle {
@@ -218,6 +247,13 @@ header p {
   gap: 0.4rem;
 }
 
+@media (max-width: 500px) {
+  .toolbar {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+}
+
 .toolbar-left {
   left: 0.75rem;
 }
@@ -241,6 +277,11 @@ header p {
 .toolbar .divider {
   border-right: solid 1px #00000030;
   margin: 0 0.35rem;
+}
+
+.toolbar .toolbar-options {
+  display: flex;
+  gap: 0.4rem;
 }
 
 .toolbar .example-menu {
@@ -328,6 +369,14 @@ header p {
   font-size: 0.8rem;
 }
 
+@media (max-width: 500px) {
+  .toolbar .example-reset {
+    left: calc(100% - 1rem);
+    top: calc(50% - 0.75rem);
+    width: 6.9rem;
+  }
+}
+
 .toolbar .example-reset .inline-center {
   display: inline-block;
   vertical-align: middle;
@@ -352,6 +401,14 @@ aside {
   padding: 0.75rem;
   border-left: 1px solid #0000002b;
   overflow: auto;
+}
+
+@media (max-width: 850px) {
+  aside {
+    border-top: 1px solid #0000002b;
+    border-left: none;
+    height: 30vh;
+  }
 }
 
 .panel {

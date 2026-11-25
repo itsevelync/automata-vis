@@ -3,7 +3,7 @@ import { LatexLabel } from "../canvas/LatexLabel";
 export default function Reference({ kind }: { kind: "dfa" | "pda" | "tm" }) {
   if (kind === "pda") {
     return (
-      <div className="help-list">
+      <div>
         <p>
           A pushdown automaton (PDA) is a 6-tuple <LatexLabel label="(Q,\Sigma,\Gamma,\delta,q_0,F)" />:
         </p>
@@ -39,7 +39,7 @@ export default function Reference({ kind }: { kind: "dfa" | "pda" | "tm" }) {
   }
   if (kind === "tm") {
     return (
-      <div className="help-list">
+      <div>
         <p>
           A Turing machine (TM) is a 7-tuple <LatexLabel label="(Q,\Sigma,\Gamma,\delta,q_0,q_a,q_r)" />:
         </p>
@@ -86,7 +86,7 @@ export default function Reference({ kind }: { kind: "dfa" | "pda" | "tm" }) {
     );
   }
   return (
-    <div className="help-list">
+    <div>
       <p>
         A deterministic finite automaton (DFA) is a 5-tuple <LatexLabel label="(Q,\Sigma,\delta,q_0,F)" />:
       </p>

@@ -22,7 +22,7 @@ The picture below is the motivating example. It uses the legacy spelling `right 
     scale=1,
     transform shape
 ]
-    \node[state,accepting] (qa) {$q_\text{accept}$};
+    \node[state,accepting] (qa) {$q_a$};
     \node[state] (q1) [below of=qa] {$q_1$};
     \node[state,initial] (q0) [right of=q1] {$q_0$};
     \node[state] (q9) [right of=q0] {$q_9$};
@@ -70,7 +70,7 @@ The same layout, as export should emit it:
     scale=1,
     transform shape
 ]
-    \node[state,accepting] (qa) {$q_\text{accept}$};
+    \node[state,accepting] (qa) {$q_a$};
     \node[state] (q1) [below=of qa] {$q_1$};
     \node[state,initial] (q0) [right=of q1] {$q_0$};
     \node[state] (q9) [right=of q0] {$q_9$};
@@ -137,7 +137,7 @@ Positions are integer grid cells. `row` increases downward, so the next row is `
   "nodes": [
     {
       "id": "qa",
-      "label": "q_\\text{accept}",
+      "label": "q_a",
       "col": 0,
       "row": 0,
       "accepting": true
@@ -185,7 +185,7 @@ Positions are integer grid cells. `row` increases downward, so the next row is `
 }
 ```
 
-- **Node.** TikZ id, display label, `col`, `row`, optional `initial`, optional `accepting`. The id and the label are different: `qa` is the name, `$q_\text{accept}$` is what is drawn.
+- **Node.** TikZ id, display label, `col`, `row`, optional `initial`, optional `accepting`. The id and the label are different: `qa` is the name, `$q_a$` is what is drawn.
 - **Edge.** `source`, `target`, optional `label`, optional `labelPos` (`above`, `below`, `left`, `right`, plus an optional TeX distance such as `0.8cm` or `0.5em`), optional `loop` side, optional `bend` of `left` or `right`.
 - **Defaults.** `node distance=3cm`, `on grid`, `->`, `>=stealth'`, `shorten >=1pt`, `auto`, `scale=1`, `transform shape`.
 - **Ids.** Unique and matching `[A-Za-z][A-Za-z0-9]*`.
@@ -250,7 +250,7 @@ After every node, emit one `\path`, in edge-creation order.
     scale=1,
     transform shape
 ]
-    \node[state,accepting] (qa) {$q_\text{accept}$};
+    \node[state,accepting] (qa) {$q_a$};
     \node[state] (q1) [below=of qa] {$q_1$};
 \end{tikzpicture}
 ```

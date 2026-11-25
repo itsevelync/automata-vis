@@ -107,7 +107,7 @@ export const wwRDiagram: Diagram = {
 export const tm1n2Diagram: Diagram = {
   defaults,
   nodes: [
-    { id: "qa", label: "q_\\text{accept}", col: 0, row: 0, accepting: true },
+    { id: "qa", label: "q_a", col: 0, row: 0, accepting: true },
     { id: "q1", label: "q_1", col: 0, row: 1 },
     { id: "q0", label: "q_0", col: 1, row: 1, initial: true },
     { id: "q9", label: "q_9", col: 2, row: 1 },

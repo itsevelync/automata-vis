@@ -15,7 +15,7 @@ function diagram(
 }
 
 const motivating: DiagramNode[] = [
-  { id: "qa", label: "q_\\text{accept}", col: 0, row: 0, accepting: true },
+  { id: "qa", label: "q_a", col: 0, row: 0, accepting: true },
   { id: "q1", label: "q_1", col: 0, row: 1 },
   { id: "q0", label: "q_0", col: 1, row: 1, initial: true },
   { id: "q9", label: "q_9", col: 2, row: 1 },
@@ -34,7 +34,7 @@ describe("generateTikZ", () => {
     expect(tikz).toContain("node distance=3cm");
     expect(tikz).not.toContain("\\usetikzlibrary");
     expect(tikz).toContain(
-      "\\node[state,accepting] (qa) {$q_\\text{accept}$};",
+      "\\node[state,accepting] (qa) {$q_a$};",
     );
     expect(tikz).toContain("\\node[state] (q1) [below=of qa] {$q_1$};");
     expect(tikz).toContain(
@@ -57,6 +57,20 @@ describe("generateTikZ", () => {
     );
     expect(tikz).toContain("\\node[state] (q2) [right=6cm of q0] {$q_2$};");
     expect(tikz).not.toContain("right=7cm of");
+  });
+
+  it("uses the diagonal center distance for an equal grid step", () => {
+    const tikz = generateTikZ(
+      diagram(
+        [
+          { id: "q0", label: "q_0", col: 0, row: 0 },
+          { id: "q3", label: "q_3", col: -1, row: 1 },
+        ],
+        [],
+        "1.5cm",
+      ),
+    );
+    expect(tikz).toContain("\\node[state] (q3) [below left=2.12132cm of q0] {$q_3$};");
   });
 
   it("uses independent center distances for a diagonal gap", () => {

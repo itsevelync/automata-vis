@@ -14,7 +14,8 @@ import { PT_PX, cellSizePx, centerToCell } from "./geometry";
 import { LatexLabel } from "./LatexLabel";
 import { StateNode } from "./StateNode";
 import { curvePath } from "./tikzPath";
-import { MdAdd, MdArrowDropDown, MdBuild, MdCode, MdHome, MdMenuBook, MdQuestionMark, MdRefresh, MdRemove, MdUploadFile } from "react-icons/md";
+import { downloadDiagramSvg } from "./exportSvg";
+import { MdAdd, MdArrowDropDown, MdBuild, MdCode, MdHome, MdImage, MdMenuBook, MdQuestionMark, MdRefresh, MdRemove, MdUploadFile } from "react-icons/md";
 import { RiEraserFill } from "react-icons/ri";
 import Reference from "../components/Reference";
 
@@ -112,7 +113,6 @@ export function DiagramCanvas() {
       1.6,
       Math.max(
         0.25,
-        Math.min((rect.width - 80) / Math.max(1, maxX - minX), (rect.height - 80) / Math.max(1, maxY - minY)),
         Math.min(
           (rect.width - 80) / Math.max(1, maxX - minX),
           (rect.height - padTop - padBottom) / contentHeight,
@@ -383,6 +383,15 @@ export function DiagramCanvas() {
         </button>
         <button title="Get LaTeX code" type="button" onClick={() => setModal("tikz")}>
           <i>LaTeX</i> <MdCode />
+        </button>
+        <button
+          title="Export SVG"
+          type="button"
+          onClick={() => {
+            if (wrapRef.current) downloadDiagramSvg(wrapRef.current, view.zoom);
+          }}
+        >
+          <MdImage />
         </button>
         <button title="Import LaTeX" type="button" onClick={() => setModal("import")}>
           <MdUploadFile />

@@ -4,8 +4,17 @@ function separateTo(source: string): string {
   return source.replace(/\\to(?=[A-Za-z])/g, "\\to ");
 }
 
-function escapeSpecial(source: string): string {
-  return source.replace(/(?<!\\)\$/g, "\\$").replace(/(?<!\\)#/g, "\\#");
+const SPECIALS = ["$", "#"];
+
+export function escapeSpecial(source: string): string {
+  return SPECIALS.reduce(
+    (text, char) => text.replace(new RegExp(`(?<!\\\\)\\${char}`, "g"), `\\${char}`),
+    source,
+  );
+}
+
+export function unescapeSpecial(source: string): string {
+  return SPECIALS.reduce((text, char) => text.replaceAll(`\\${char}`, char), source);
 }
 
 export function mathSource(label: string): { source: string; displayMode: boolean } {
@@ -28,13 +37,13 @@ const INPUT_SYMBOLS: [string, string][] = [
 ];
 
 export function labelToInput(value: string): string {
-  const shown = value.replaceAll("\\$", "$").replaceAll("\\#", "#");
+  const shown = unescapeSpecial(value);
   return INPUT_SYMBOLS.reduce((text, [command, symbol]) => text.replaceAll(command, symbol), shown);
 }
 
 export function inputToLabel(value: string): string {
   const labeled = INPUT_SYMBOLS.reduce((text, [command, symbol]) => text.replaceAll(symbol, command), value);
-  return labeled.replaceAll("$", "\\$").replaceAll("#", "\\#");
+  return escapeSpecial(labeled);
 }
 
 export function displayEdgeLabel(lines: string[], kind: AutomataKind): string {

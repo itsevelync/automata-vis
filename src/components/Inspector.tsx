@@ -9,8 +9,8 @@ import {
   splitTransition,
   type TransitionKind,
 } from "../model/labels";
-import { formatLength, formatMagnitude, parseLength } from "../model/length";
 import type { AutomataKind, Bend, DiagramEdge, DiagramNode, Side } from "../model/types";
+import { LengthField } from "./LengthField";
 import { useDiagram } from "../store/diagram";
 
 const SIDES: Side[] = ["above", "below", "left", "right"];
@@ -420,14 +420,6 @@ function BendAngle({
   );
 }
 
-const LENGTH_UNITS = ["cm", "mm", "pt", "em", "ex", "in"];
-
-function distanceParts(distance?: string): { magnitude: string; unit: string } {
-  const parsed = distance ? parseLength(distance) : null;
-  if (!parsed) return { magnitude: "", unit: "cm" };
-  return { magnitude: formatMagnitude(parsed.magnitude), unit: parsed.unit };
-}
-
 function LabelDistance({
   edge,
   updateEdge,
@@ -435,72 +427,18 @@ function LabelDistance({
   edge: DiagramEdge;
   updateEdge: (id: string, patch: Partial<DiagramEdge>) => void;
 }) {
-  const initial = distanceParts(edge.labelPos?.distance);
-  const [magnitude, setMagnitude] = useState(initial.magnitude);
-  const [unit, setUnit] = useState(initial.unit);
-  useEffect(() => {
-    const next = distanceParts(edge.labelPos?.distance);
-    setMagnitude(next.magnitude);
-    setUnit(next.unit);
-  }, [edge.labelPos?.distance, edge.id]);
-
-  function commit(nextMagnitude: string, nextUnit: string) {
-    if (!edge.labelPos) return;
-    const side = edge.labelPos.side;
-    const value = nextMagnitude.trim();
-    if (!value) {
-      updateEdge(edge.id, { labelPos: { side, distance: undefined } });
-      return;
-    }
-    const amount = Number(value);
-    if (!Number.isFinite(amount) || amount <= 0) {
-      const current = distanceParts(edge.labelPos?.distance);
-      setMagnitude(current.magnitude);
-      setUnit(current.unit);
-      return;
-    }
-    const distance = formatLength({ magnitude: amount, unit: nextUnit });
-    if (edge.labelPos?.side === side && edge.labelPos.distance === distance) return;
-    updateEdge(edge.id, { labelPos: { side, distance } });
-  }
-
-  const units = LENGTH_UNITS.includes(unit) ? LENGTH_UNITS : [unit, ...LENGTH_UNITS];
+  if (!edge.labelPos) return null;
+  const side = edge.labelPos.side;
   return (
-    <label htmlFor="label-distance">
-      Label distance
-      <span className="distance-field">
-        <input
-          id="label-distance"
-          type="number"
-          min="0"
-          step="any"
-          value={magnitude}
-          placeholder="0.11"
-          onChange={(event) => {
-            const next = event.target.value;
-            setMagnitude(next);
-            const amount = Number(next);
-            if (next.trim() && Number.isFinite(amount) && amount > 0) commit(next, unit);
-          }}
-          onBlur={() => commit(magnitude, unit)}
-        />
-        <select
-          id="label-distance-unit"
-          aria-label="Label distance unit"
-          value={unit}
-          onChange={(event) => {
-            const nextUnit = event.target.value;
-            setUnit(nextUnit);
-            if (magnitude.trim()) commit(magnitude, nextUnit);
-          }}
-        >
-          {units.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </span>
-    </label>
+    <LengthField
+      id="label-distance"
+      label="Label distance"
+      value={edge.labelPos.distance}
+      placeholder="0.11"
+      onCommit={(distance) => {
+        updateEdge(edge.id, { labelPos: { side, distance } });
+        return true;
+      }}
+    />
   );
 }

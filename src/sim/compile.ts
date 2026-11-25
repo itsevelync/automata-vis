@@ -1,4 +1,4 @@
-import { splitTransition, transitionText } from "../model/labels";
+import { splitTransition, transitionText, unescapeSpecial } from "../model/labels";
 import type { AutomataKind, DiagramEdge, DiagramNode } from "../model/types";
 
 export const EPSILON = "\\varepsilon";
@@ -41,7 +41,7 @@ export function tokenize(input: string): string[] {
       index += 1;
       continue;
     }
-    if (char === "\\" && (input[index + 1] === "$" || input[index + 1] === "#")) {
+    if (char === "\\" && input[index + 1] && unescapeSpecial(input.slice(index, index + 2)).length === 1) {
       symbols.push(input[index + 1]);
       index += 2;
       continue;
@@ -61,7 +61,7 @@ export function tokenize(input: string): string[] {
 }
 
 function runtimeSymbol(symbol: string): string {
-  return symbol.replaceAll("\\$", "$").replaceAll("\\#", "#");
+  return unescapeSpecial(symbol);
 }
 
 function tokenizePush(value: string): string[] {

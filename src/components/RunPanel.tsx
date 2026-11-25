@@ -8,6 +8,10 @@ import { useRun } from "../store/run";
 import { MdFastForward, MdPause, MdPlayArrow, MdReplay, MdSkipNext, MdSkipPrevious } from "react-icons/md";
 import DecisionTree from "./DecisionTree";
 
+const SPEED_MIN = 50;
+const SPEED_MAX = 1000;
+const SPEED_STEP = 50;
+
 export function RunPanel() {
   const automataKind = useDiagram((state) => state.automataKind);
   const nodes = useDiagram((state) => state.nodes);
@@ -160,21 +164,16 @@ export function RunPanel() {
                 <MdFastForward />
               </button>
             </div>
-            <div className="run-controls">
-              
-            </div>
             <label className="speed-control">
               Speed
               <input
                 type="range"
-                min={50}
-                max={1000}
-                step={50}
-                value={1050 - speed}
-                style={{flexGrow: 1}}
-                onChange={(event) =>
-                  setSpeed(1050 - Number(event.target.value))
-                }
+                min={SPEED_MIN}
+                max={SPEED_MAX}
+                step={SPEED_STEP}
+                value={SPEED_MIN + SPEED_MAX - speed}
+                style={{ flexGrow: 1 }}
+                onChange={(event) => setSpeed(SPEED_MIN + SPEED_MAX - Number(event.target.value))}
               />
             </label>
             <p className="muted">

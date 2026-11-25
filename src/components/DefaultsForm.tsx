@@ -1,98 +1,34 @@
-import { useEffect, useState } from "react";
-import { formatLength, formatMagnitude, parseLength } from "../model/length";
+import { useState } from "react";
+import { formatLength } from "../model/length";
 import { useDiagram } from "../store/diagram";
+import { LengthField } from "./LengthField";
 
-const DEFAULT_NODE_DISTANCE = "3";
-const LENGTH_UNITS = ["cm", "mm", "pt", "em", "ex", "in"];
-
-function distanceParts(distance: string): { magnitude: string; unit: string } {
-  const parsed = parseLength(distance);
-  if (!parsed) return { magnitude: "", unit: "cm" };
-  return { magnitude: formatMagnitude(parsed.magnitude), unit: parsed.unit };
-}
+const DEFAULT_NODE_DISTANCE = 3;
 
 export function DefaultsForm() {
   const nodeDistance = useDiagram((state) => state.nodeDistance);
   const setNodeDistance = useDiagram((state) => state.setNodeDistance);
-  const initial = distanceParts(nodeDistance);
-  const [magnitude, setMagnitude] = useState(initial.magnitude);
-  const [unit, setUnit] = useState(initial.unit);
   const [invalid, setInvalid] = useState(false);
 
-  useEffect(() => {
-    const next = distanceParts(nodeDistance);
-    setMagnitude(next.magnitude);
-    setUnit(next.unit);
-    setInvalid(false);
-  }, [nodeDistance]);
-
-  function commit(nextMagnitude: string, nextUnit: string) {
-    let value = nextMagnitude.trim();
-    if (!value) {
-      value = DEFAULT_NODE_DISTANCE
-    }
-    const amount = Number(value);
-    if (!Number.isFinite(amount) || amount <= 0) {
-      setInvalid(true);
-      const current = distanceParts(nodeDistance);
-      setMagnitude(current.magnitude);
-      setUnit(current.unit);
-      return;
-    }
-    const distance = formatLength({ magnitude: amount, unit: nextUnit });
-    if (distance === nodeDistance) {
-      setInvalid(false);
-      return;
-    }
-    const ok = setNodeDistance(distance);
-    setInvalid(!ok);
-    if (!ok) {
-      const current = distanceParts(nodeDistance);
-      setMagnitude(current.magnitude);
-      setUnit(current.unit);
-    }
-  }
-
-  const units = LENGTH_UNITS.includes(unit) ? LENGTH_UNITS : [unit, ...LENGTH_UNITS];
   return (
     <section className="panel">
-      <label htmlFor="node-distance">
-        Node distance
-        <span className="distance-field">
-          <input
-            id="node-distance"
-            type="number"
-            min="0"
-            step="any"
-            value={magnitude}
-            placeholder={DEFAULT_NODE_DISTANCE}
-            onChange={(event) => {
-              const next = event.target.value;
-              setMagnitude(next);
-              setInvalid(false);
-              const amount = Number(next);
-              if (next.trim() && Number.isFinite(amount) && amount > 0) commit(next, unit);
-            }}
-            onBlur={() => commit(magnitude, unit)}
-          />
-          <select
-            id="node-distance-unit"
-            aria-label="Node distance unit"
-            value={unit}
-            onChange={(event) => {
-              const nextUnit = event.target.value;
-              setUnit(nextUnit);
-              if (magnitude.trim()) commit(magnitude, nextUnit);
-            }}
-          >
-            {units.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </span>
-      </label>
+      <LengthField
+        id="node-distance"
+        label="Node distance"
+        value={nodeDistance}
+        placeholder={String(DEFAULT_NODE_DISTANCE)}
+        onCommit={(distance) => {
+          const next =
+            distance ?? formatLength({ magnitude: DEFAULT_NODE_DISTANCE, unit: "cm" });
+          if (next === nodeDistance) {
+            setInvalid(false);
+            return true;
+          }
+          const ok = setNodeDistance(next);
+          setInvalid(!ok);
+          return ok;
+        }}
+      />
       {invalid ? <p className="error">Use one positive length, such as 3cm.</p> : null}
       <p className="muted">Distance between nodes.</p>
     </section>

@@ -3,7 +3,7 @@ import type { AutomataKind, Diagram } from "./model/types";
 
 const defaults = { nodeDistance: "3cm", scale: 1 };
 
-export const dfaDiagram: Diagram = {
+export const dfaEnds101Diagram: Diagram = {
   defaults,
   nodes: [
     { id: "q0", label: "q_0", col: 0, row: 0, initial: true },
@@ -39,7 +39,7 @@ export const nfaEnds101Diagram: Diagram = {
   ],
 };
 
-export const div3Diagram: Diagram = {
+export const dfaDiv3Diagram: Diagram = {
   defaults,
   nodes: [
     { id: "q0", label: "q_0", col: 0, row: 0, initial: true, accepting: true },
@@ -56,7 +56,7 @@ export const div3Diagram: Diagram = {
   ],
 };
 
-export const pdaDiagram: Diagram = {
+export const pda0n1nDiagram: Diagram = {
   defaults,
   nodes: [
     { id: "q0", label: "q_0", col: 0, row: 0, initial: true },
@@ -104,7 +104,7 @@ export const wwRDiagram: Diagram = {
   ],
 };
 
-export const motivatingDiagram: Diagram = {
+export const tm1n2Diagram: Diagram = {
   defaults,
   nodes: [
     { id: "qa", label: "q_\\text{accept}", col: 0, row: 0, accepting: true },
@@ -215,32 +215,60 @@ export const nfa4n2Diagram: Diagram = {
   ],
 };
 
+export const abcDiagram: Diagram = {
+  defaults,
+  nodes: [
+    { id: "q0", label: "q_{0}", col: 0, row: 0, initial: true, accepting: true },
+    { id: "q1", label: "q_{1}", col: 1, row: 0 },
+    { id: "q4", label: "q_{4}", col: 2, row: 0 },
+    { id: "q2", label: "q_{2}", col: 1, row: 1 },
+    { id: "q5", label: "q_{5}", col: 2, row: 1 },
+    { id: "q3", label: "q_{3}", col: 1, row: 2, accepting: true },
+    { id: "q6", label: "q_{6}", col: 2, row: 2, accepting: true },
+  ],
+  edges: [
+    { id: "e1", source: "q0", target: "q1", label: "\\varepsilon,\\varepsilon\\to\\$" },
+    { id: "e2", source: "q1", target: "q2", label: "\\varepsilon,\\varepsilon\\to\\varepsilon", labelPos: { side: "left" } },
+    { id: "e3", source: "q2", target: "q3", label: "\\varepsilon,\\$\\to\\varepsilon", labelPos: { side: "left" } },
+    { id: "e4", source: "q1", target: "q4", label: "\\varepsilon,\\varepsilon\\to\\varepsilon" },
+    { id: "e5", source: "q4", target: "q5", label: "\\varepsilon,\\varepsilon\\to\\varepsilon" },
+    { id: "e6", source: "q5", target: "q6", label: "\\varepsilon,\\$\\to\\varepsilon" },
+    { id: "e7", source: "q1", target: "q1", label: "a,\\varepsilon\\to a", loop: "above" },
+    { id: "e8", source: "q2", target: "q2", label: "b,a\\to\\varepsilon", loop: "left" },
+    { id: "e9", source: "q3", target: "q3", label: "c,\\varepsilon\\to\\varepsilon", loop: "left" },
+    { id: "e10", source: "q4", target: "q4", label: "b,\\varepsilon\\to\\varepsilon", loop: "right" },
+    { id: "e11", source: "q5", target: "q5", label: "c,a\\to\\varepsilon", loop: "right" },
+  ],
+};
+
 const DIAGRAMS = {
-  dfa: dfaDiagram,
+  dfa101: dfaEnds101Diagram,
   nfa101: nfaEnds101Diagram,
   nfa4n2: nfa4n2Diagram,
-  div3: div3Diagram,
-  pda: pdaDiagram,
+  div3: dfaDiv3Diagram,
+  pda0n1n: pda0n1nDiagram,
   wwr: wwRDiagram,
-  tm: motivatingDiagram,
+  abc: abcDiagram,
+  tm1n2: tm1n2Diagram,
 } as const;
 
 export const EXAMPLES: Record<AutomataKind, { id: string; label: string }[]> = {
   dfa: [
-    { id: "dfa", label: "\\text{Ends with }101 \\text{ (DFA)}" },
+    { id: "dfa101", label: "\\text{Ends with }101 \\text{ (DFA)}" },
     { id: "nfa101", label: "\\text{Ends with }101 \\text{ (NFA)}" },
     { id: "div3", label: "\\text{Divisible by }3 \\text{ (DFA)}" },
     { id: "nfa4n2", label: "\\{1^{4n+2}\\mid n\\in\\mathbb{N}\\}\\text{ (NFA)}" },
   ],
   pda: [
-    { id: "pda", label: "\\{0^n1^n\\mid n\\in\\mathbb{N}\\}" },
+    { id: "pda0n1n", label: "\\{0^n1^n\\mid n\\in\\mathbb{N}\\}" },
     { id: "wwr", label: "\\{ww^R\\mid w\\in\\Sigma^*\\}" },
+    { id: "abc", label: "\\{a^ib^jc^k\\mid i=j\\lor i=k\\}" },
   ],
-  tm: [{ id: "tm", label: "\\{1^{n^2}\\mid n\\in\\mathbb{N}\\}" }],
+  tm: [{ id: "tm1n2", label: "\\{1^{n^2}\\mid n\\in\\mathbb{N}\\}" }],
 };
 
 export function exampleFor(kind: AutomataKind): Diagram {
-  return kind === "pda" ? pdaDiagram : kind === "tm" ? motivatingDiagram : dfaDiagram;
+  return kind === "pda" ? pda0n1nDiagram : kind === "tm" ? tm1n2Diagram : dfaEnds101Diagram;
 }
 
 export function exampleById(id: string): Diagram | null {

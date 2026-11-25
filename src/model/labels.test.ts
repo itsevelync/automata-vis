@@ -9,6 +9,7 @@ import {
   labelToInput,
   mathSource,
   splitTransition,
+  transitionText,
 } from "./labels";
 
 describe("formatLabel", () => {
@@ -31,6 +32,8 @@ describe("formatLabel", () => {
       "$\\begin{array}{c} a \\end{array}$",
     );
     expect(mathSource("1\\tob").source).toBe("1\\to b");
+    expect(mathSource("$").source).toBe("\\$");
+    expect(mathSource("\\$").source).toBe("\\$");
     expect(formatLabel("a,Z\\toaZ")).toBe("$a,Z\\to aZ$");
   });
 });
@@ -67,6 +70,9 @@ describe("transition labels", () => {
     expect(displayEdgeLabel([""], "tm")).toBe("\\textvisiblespace\\to\\textvisiblespace,R");
     expect(displayEdgeLabel(["a,\\to"], "pda")).toBe("a,\\varepsilon\\to\\varepsilon");
     expect(displayEdgeLabel([""], "pda")).toBe("\\varepsilon,\\varepsilon\\to\\varepsilon");
+    expect(transitionText(undefined, "\\varepsilon,\\varepsilon\\to\\$", "pda")).toEqual([
+      "\\varepsilon,\\varepsilon\\to\\$",
+    ]);
   });
 });
 

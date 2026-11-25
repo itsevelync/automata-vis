@@ -4,16 +4,20 @@ function separateTo(source: string): string {
   return source.replace(/\\to(?=[A-Za-z])/g, "\\to ");
 }
 
+function escapeDollars(source: string): string {
+  return source.replace(/(?<!\\)\$/g, "\\$");
+}
+
 export function mathSource(label: string): { source: string; displayMode: boolean } {
   const trimmed = separateTo(label.trim());
   if (trimmed.startsWith("$$") && trimmed.endsWith("$$") && trimmed.length > 4) {
-    return { source: trimmed.slice(2, -2), displayMode: true };
+    return { source: escapeDollars(trimmed.slice(2, -2)), displayMode: true };
   }
-  if (trimmed.startsWith("$") && trimmed.endsWith("$") && trimmed.length > 2) {
+  if (trimmed.startsWith("$") && trimmed.endsWith("$") && trimmed.length > 2 && !trimmed.endsWith("\\$")) {
     const source = trimmed.slice(1, -1);
-    return { source, displayMode: source.includes("\\begin") };
+    return { source: escapeDollars(source), displayMode: source.includes("\\begin") };
   }
-  return { source: trimmed, displayMode: trimmed.includes("\\begin") };
+  return { source: escapeDollars(trimmed), displayMode: trimmed.includes("\\begin") };
 }
 
 const EPSILON = "\\varepsilon";
@@ -49,7 +53,7 @@ export function transitionText(
 }
 
 function splitLabelLines(label: string): string[] {
-  const source = label.trim().replace(/^\$/, "").replace(/\$$/, "").trim();
+  const source = label.trim().replace(/^\$/, "").replace(/(?<!\\)\$$/, "").trim();
   const match = source.match(/^\\begin\{array\}\{c\}([\s\S]*)\\end\{array\}$/);
   if (!match) return [source];
   return match[1]

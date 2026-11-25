@@ -73,6 +73,37 @@ export const pdaDiagram: Diagram = {
   ],
 };
 
+export const wwRDiagram: Diagram = {
+  defaults,
+  nodes: [
+    { id: "q0", label: "q_{0}", col: 0, row: 0, initial: true },
+    { id: "q1", label: "q_{1}", col: 1, row: 0 },
+    { id: "q2", label: "q_{2}", col: 2, row: 0 },
+    { id: "q3", label: "q_{3}", col: 3, row: 0, accepting: true },
+  ],
+  edges: [
+    { id: "e1", source: "q0", target: "q1", label: "\\varepsilon,\\varepsilon\\to\\$" },
+    {
+      id: "e2",
+      source: "q1",
+      target: "q1",
+      lines: ["0,\\varepsilon\\to0", "1,\\varepsilon\\to1"],
+      label: joinLabels(["0,\\varepsilon\\to0", "1,\\varepsilon\\to1"]),
+      loop: "below",
+    },
+    { id: "e3", source: "q1", target: "q2", label: "\\varepsilon,\\varepsilon\\to\\varepsilon" },
+    {
+      id: "e4",
+      source: "q2",
+      target: "q2",
+      lines: ["0,0\\to\\varepsilon", "1,1\\to\\varepsilon"],
+      label: joinLabels(["0,0\\to\\varepsilon", "1,1\\to\\varepsilon"]),
+      loop: "below",
+    },
+    { id: "e5", source: "q2", target: "q3", label: "\\varepsilon,\\$\\to\\varepsilon" },
+  ],
+};
+
 export const motivatingDiagram: Diagram = {
   defaults,
   nodes: [
@@ -164,11 +195,33 @@ export const motivatingDiagram: Diagram = {
   ],
 };
 
+export const nfa4n2Diagram: Diagram = {
+  defaults: { nodeDistance: "1.5cm", scale: 1 },
+  nodes: [
+    { id: "q0", label: "q_{0}", col: 0, row: 0, initial: true },
+    { id: "q4", label: "q_{4}", col: 2, row: 0 },
+    { id: "q5", label: "q_{5}", col: 4, row: 0, accepting: true },
+    { id: "q3", label: "q_{3}", col: -1, row: 1 },
+    { id: "q1", label: "q_{1}", col: 1, row: 1 },
+    { id: "q2", label: "q_{2}", col: 0, row: 2 },
+  ],
+  edges: [
+    { id: "e1", source: "q0", target: "q1", label: "1" },
+    { id: "e2", source: "q1", target: "q2", label: "1" },
+    { id: "e3", source: "q2", target: "q3", label: "1" },
+    { id: "e4", source: "q3", target: "q0", label: "1" },
+    { id: "e5", source: "q0", target: "q4", label: "1" },
+    { id: "e6", source: "q4", target: "q5", label: "1" },
+  ],
+};
+
 const DIAGRAMS = {
   dfa: dfaDiagram,
   nfa101: nfaEnds101Diagram,
+  nfa4n2: nfa4n2Diagram,
   div3: div3Diagram,
   pda: pdaDiagram,
+  wwr: wwRDiagram,
   tm: motivatingDiagram,
 } as const;
 
@@ -176,10 +229,14 @@ export const EXAMPLES: Record<AutomataKind, { id: string; label: string }[]> = {
   dfa: [
     { id: "dfa", label: "\\text{Ends with }101 \\text{ (DFA)}" },
     { id: "nfa101", label: "\\text{Ends with }101 \\text{ (NFA)}" },
-    { id: "div3", label: "\\text{Divisible by }3" },
+    { id: "div3", label: "\\text{Divisible by }3 \\text{ (DFA)}" },
+    { id: "nfa4n2", label: "\\{1^{4n+2}\\mid n\\in\\mathbb{N}\\}\\text{ (NFA)}" },
   ],
-  pda: [{ id: "pda", label: "0^n1^n" }],
-  tm: [{ id: "tm", label: "1^{n^2}" }],
+  pda: [
+    { id: "pda", label: "\\{0^n1^n\\mid n\\in\\mathbb{N}\\}" },
+    { id: "wwr", label: "\\{ww^R\\mid w\\in\\Sigma^*\\}" },
+  ],
+  tm: [{ id: "tm", label: "\\{1^{n^2}\\mid n\\in\\mathbb{N}\\}" }],
 };
 
 export function exampleFor(kind: AutomataKind): Diagram {

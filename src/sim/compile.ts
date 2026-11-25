@@ -55,6 +55,10 @@ export function tokenize(input: string): string[] {
   return symbols;
 }
 
+function runtimeSymbol(symbol: string): string {
+  return symbol.replaceAll("\\$", "$");
+}
+
 function tokenizePush(value: string): string[] {
   if (isEpsilon(value)) return [];
   return tokenize(value);
@@ -62,7 +66,7 @@ function tokenizePush(value: string): string[] {
 
 export function compile(kind: AutomataKind, nodes: DiagramNode[], edges: DiagramEdge[]): Machine {
   const errors: string[] = [];
-  if (nodes.length === 0) errors.push("Add a state.");
+  if (nodes.length === 0) errors.push("Add a state to the canvas.");
   const initials = nodes.filter((node) => node.initial);
   if (nodes.length > 0 && initials.length === 0) errors.push("Mark one state as initial.");
   if (initials.length > 1) errors.push("Mark only one state as initial.");
@@ -80,7 +84,7 @@ export function compile(kind: AutomataKind, nodes: DiagramNode[], edges: Diagram
           edgeId: edge.id,
           source: edge.source,
           target: edge.target,
-          read: isEpsilon(line) ? "" : line.trim(),
+          read: isEpsilon(line) ? "" : runtimeSymbol(line.trim()),
           pop: "",
           push: [],
           write: "",
@@ -97,10 +101,10 @@ export function compile(kind: AutomataKind, nodes: DiagramNode[], edges: Diagram
           edgeId: edge.id,
           source: edge.source,
           target: edge.target,
-          read: first,
+          read: runtimeSymbol(first),
           pop: "",
           push: [],
-          write: second || BLANK,
+          write: runtimeSymbol(second || BLANK),
           move: third === "L" ? "L" : "R",
         });
         return;
@@ -109,9 +113,9 @@ export function compile(kind: AutomataKind, nodes: DiagramNode[], edges: Diagram
         edgeId: edge.id,
         source: edge.source,
         target: edge.target,
-        read: isEpsilon(first) ? "" : first,
-        pop: isEpsilon(second) ? "" : second,
-        push: tokenizePush(third),
+        read: isEpsilon(first) ? "" : runtimeSymbol(first),
+        pop: isEpsilon(second) ? "" : runtimeSymbol(second),
+        push: tokenizePush(runtimeSymbol(third)),
         write: "",
         move: "R",
       });

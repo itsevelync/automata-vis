@@ -3,6 +3,7 @@ import { DefaultsForm } from "../components/DefaultsForm";
 import { ExportPanel } from "../components/ExportPanel";
 import { Modal } from "../components/Modal";
 import { EXAMPLES, exampleById } from "../example";
+import { AUTOMATA_KINDS } from "../model/types";
 import { parseLength } from "../model/length";
 import { useDiagram } from "../store/diagram";
 import { useRun } from "../store/run";
@@ -12,8 +13,9 @@ import { PT_PX, cellSizePx, centerToCell } from "./geometry";
 import { LatexLabel } from "./LatexLabel";
 import { StateNode } from "./StateNode";
 import { curvePath } from "./tikzPath";
-import { MdAdd, MdArrowDropDown, MdBuild, MdCode, MdHome, MdQuestionMark, MdRefresh, MdRemove } from "react-icons/md";
+import { MdAdd, MdArrowDropDown, MdBuild, MdCode, MdHome, MdMenuBook, MdQuestionMark, MdRefresh, MdRemove } from "react-icons/md";
 import { RiEraserFill } from "react-icons/ri";
+import Reference from "../components/Reference";
 
 type View = { x: number; y: number; zoom: number };
 
@@ -45,7 +47,7 @@ export function DiagramCanvas() {
   >(null);
   const [view, setView] = useState<View>({ x: 48, y: 48, zoom: 1 });
   const [panning, setPanning] = useState(false);
-  const [modal, setModal] = useState<"help" | "tikz" | "defaults" | null>(null);
+  const [modal, setModal] = useState<"help" | "tikz" | "defaults" | "reference" | null>(null);
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [exampleId, setExampleId] = useState<string | null>(null);
   const [exampleIndex, setExampleIndex] = useState(0);
@@ -280,7 +282,7 @@ export function DiagramCanvas() {
         select(null);
       }}
     >
-      <div className="toolbar">
+      <div className="toolbar toolbar-left">
         <div className={examplesOpen ? "example-menu open" : "example-menu"} ref={examplesRef}>
           <button
             type="button"
@@ -359,7 +361,7 @@ export function DiagramCanvas() {
       </div>
       <Modal open={modal === "help"} title="Help" onClose={() => setModal(null)}>
         <ul className="help-list">
-          <li>Add a state &mdash; Double-click the grid.</li>
+          <li>Add a state &mdash; Double-click the canvas.</li>
           <li>Move a state &mdash; Click to select, then drag it.</li>
           <li>Add an edge &mdash; Hold <span className="code">Shift</span> with a state selected and select a second state.</li>
           <li>Edit a state or edge &mdash; Select it and edit using the sidebar.</li>
@@ -369,9 +371,21 @@ export function DiagramCanvas() {
       <Modal open={modal === "defaults"} title="Defaults" onClose={() => setModal(null)}>
         <DefaultsForm />
       </Modal>
+      <Modal
+        open={modal === "reference"}
+        title={AUTOMATA_KINDS.find((item) => item.kind === automataKind)?.label ?? "Reference"}
+        onClose={() => setModal(null)}
+      >
+        <Reference kind={automataKind} />
+      </Modal>
       <Modal open={modal === "tikz"} title="LaTeX Code" onClose={() => setModal(null)}>
         <ExportPanel />
       </Modal>
+      <div className="toolbar toolbar-right">
+        <button type="button" title="Reference" onClick={() => setModal("reference")}>
+          <MdMenuBook />
+        </button>
+      </div>
       <div className="canvas-controls">
         <button title="Canvas settings" type="button" onClick={() => setModal("defaults")}>
           <MdBuild />

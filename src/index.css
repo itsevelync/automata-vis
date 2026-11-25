@@ -52,6 +52,11 @@ p {
   margin-top: 0;
 }
 
+ul.dash {
+  list-style-type: "-  ";
+  padding-left: 1.5rem;
+}
+
 .app {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
@@ -205,9 +210,28 @@ header p {
   position: absolute;
   z-index: 5;
   top: 0.75rem;
-  left: 0.75rem;
   display: flex;
   gap: 0.4rem;
+}
+
+.toolbar-left {
+  left: 0.75rem;
+}
+
+.toolbar-right {
+  right: 0.75rem;
+}
+
+.toolbar.toolbar-right button {
+  padding: 0.2rem;
+  border: none;
+  background-color: transparent;
+  font-size: 1.5rem;
+}
+
+.toolbar.toolbar-right button:hover {
+  background-color: transparent;
+  opacity: 0.8;
 }
 
 .toolbar .divider {

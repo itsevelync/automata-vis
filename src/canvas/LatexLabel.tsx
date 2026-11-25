@@ -1,7 +1,7 @@
 import katex from "katex";
 import { mathSource } from "../model/labels";
 
-export function LatexLabel({ label, className }: { label: string; className: string }) {
+export function LatexLabel({ label, className="example-math" }: { label: string; className?: string }) {
   const { source, displayMode } = mathSource(label);
   if (!source) return null;
   const html = katex.renderToString(source, {

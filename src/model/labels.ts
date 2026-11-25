@@ -1,7 +1,11 @@
 import type { AutomataKind } from "./types";
 
+function separateTo(source: string): string {
+  return source.replace(/\\to(?=[A-Za-z])/g, "\\to ");
+}
+
 export function mathSource(label: string): { source: string; displayMode: boolean } {
-  const trimmed = label.trim();
+  const trimmed = separateTo(label.trim());
   if (trimmed.startsWith("$$") && trimmed.endsWith("$$") && trimmed.length > 4) {
     return { source: trimmed.slice(2, -2), displayMode: true };
   }
@@ -20,11 +24,13 @@ const INPUT_SYMBOLS: [string, string][] = [
 ];
 
 export function labelToInput(value: string): string {
-  return INPUT_SYMBOLS.reduce((text, [command, symbol]) => text.replaceAll(command, symbol), value);
+  const shown = value.replaceAll("\\$", "$");
+  return INPUT_SYMBOLS.reduce((text, [command, symbol]) => text.replaceAll(command, symbol), shown);
 }
 
 export function inputToLabel(value: string): string {
-  return INPUT_SYMBOLS.reduce((text, [command, symbol]) => text.replaceAll(symbol, command), value);
+  const labeled = INPUT_SYMBOLS.reduce((text, [command, symbol]) => text.replaceAll(symbol, command), value);
+  return labeled.replaceAll("$", "\\$");
 }
 
 export function displayEdgeLabel(lines: string[], kind: AutomataKind): string {
@@ -98,6 +104,6 @@ export function joinTransition(parts: TransitionParts, kind: TransitionKind): st
 export function formatLabel(label: string): string {
   const trimmed = label.trim();
   if (!trimmed) return "";
-  if (trimmed.startsWith("$")) return trimmed;
-  return `$${trimmed}$`;
+  if (trimmed.startsWith("$")) return separateTo(trimmed);
+  return `$${separateTo(trimmed)}$`;
 }

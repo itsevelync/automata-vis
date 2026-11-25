@@ -7,6 +7,7 @@ import {
   joinLabels,
   joinTransition,
   labelToInput,
+  mathSource,
   splitTransition,
 } from "./labels";
 
@@ -29,6 +30,8 @@ describe("formatLabel", () => {
     expect(formatLabel("\\begin{array}{c} a \\end{array}")).toBe(
       "$\\begin{array}{c} a \\end{array}$",
     );
+    expect(mathSource("1\\tob").source).toBe("1\\to b");
+    expect(formatLabel("a,Z\\toaZ")).toBe("$a,Z\\to aZ$");
   });
 });
 
@@ -36,6 +39,8 @@ describe("label input symbols", () => {
   it("shows epsilon and visible space in the input", () => {
     expect(labelToInput("\\varepsilon\\to\\textvisiblespace")).toBe("\u03b5\\to\u2423");
     expect(inputToLabel("\u03b5\u2423")).toBe("\\varepsilon\\textvisiblespace");
+    expect(inputToLabel("$")).toBe("\\$");
+    expect(labelToInput("\\$")).toBe("$");
   });
 });
 

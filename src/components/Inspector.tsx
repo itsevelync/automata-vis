@@ -475,7 +475,7 @@ function LabelDistance({
           min="0"
           step="any"
           value={magnitude}
-          placeholder="0.8"
+          placeholder="0.11"
           onChange={(event) => {
             const next = event.target.value;
             setMagnitude(next);

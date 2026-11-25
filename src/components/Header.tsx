@@ -4,6 +4,8 @@ import { useDiagram } from "../store/diagram";
 import { useRun } from "../store/run";
 import { useSession, type AppMode } from "../store/session";
 import { Modal } from "./Modal";
+import { MdInfoOutline } from "react-icons/md";
+import About from "./About";
 
 export function Header() {
   const automataKind = useDiagram((state) => state.automataKind);
@@ -14,6 +16,7 @@ export function Header() {
   const mode = useSession((state) => state.mode);
   const setMode = useSession((state) => state.setMode);
   const [pendingKind, setPendingKind] = useState<AutomataKind | null>(null);
+  const [infoOpen, setInfoOpen] = useState(false);
 
   function chooseMode(next: AppMode) {
     if (next === mode) return;
@@ -46,6 +49,16 @@ export function Header() {
         <p>Create and visualize state diagrams for automata.</p>
       </div>
       <div className="header-controls">
+        <button title="About" className="info-btn" onClick={() => setInfoOpen(true)}>
+          <MdInfoOutline />
+        </button>
+        <Modal
+          open={infoOpen}
+          title="About"
+          onClose={() => setInfoOpen(false)}
+        >
+          <About />
+        </Modal>
         <div className="mode-toggle" role="group" aria-label="Mode">
           <button type="button" aria-pressed={mode === "build"} onClick={() => chooseMode("build")}>
             Build

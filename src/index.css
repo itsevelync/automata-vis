@@ -52,6 +52,10 @@ p {
   margin-top: 0;
 }
 
+a {
+  color: inherit;
+}
+
 ul.dash {
   list-style-type: "-  ";
   padding-left: 1.5rem;
@@ -838,4 +842,51 @@ aside {
   margin: 0;
   text-align: center;
   white-space: nowrap;
+}
+
+summary {
+  cursor: pointer;
+}
+
+header button.info-btn {
+  background-color: transparent;
+  padding: 0;
+  border: 0;
+  margin-top: 0.2rem;
+  font-size: 1.3rem;
+  vertical-align: middle;
+}
+
+header button.info-btn:hover {
+  opacity: 0.8;
+}
+
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.5rem;
+}
+
+.feedback-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.feedback-form input,
+.feedback-form textarea {
+  padding: 0.35rem;
+  border: 1px solid #0000002b;
+  background: #00000001;
+}
+
+.feedback-form input[type="file"] {
+  margin-top: 0.25rem;
+  border: solid 1px #0000002b;
+  padding: 0.35rem;
+}
+
+.feedback-form-success {
+  margin-top: 0.5rem;
 }

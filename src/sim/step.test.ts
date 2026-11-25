@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dfaDiagram, div3Diagram, nfaEnds101Diagram, pdaDiagram } from "../example";
+import { dfaEnds101Diagram, dfaDiv3Diagram, nfaEnds101Diagram, pda0n1nDiagram } from "../example";
 import type { DiagramEdge, DiagramNode } from "../model/types";
 import { compile, tokenize } from "./compile";
 import { createEngine, stepEngine } from "./step";
@@ -27,6 +27,7 @@ function run(kind: "dfa" | "pda" | "tm", nodes: DiagramNode[], edges: DiagramEdg
 describe("simulator", () => {
   it("tokenizes characters and latex commands", () => {
     expect(tokenize("01 \\textvisiblespace\\varepsilon")).toEqual(["0", "1", "\\textvisiblespace"]);
+    expect(tokenize("\\#\\$")).toEqual(["#", "$"]);
   });
 
   it("accepts a DFA run and rejects a missing symbol", () => {
@@ -112,19 +113,33 @@ describe("simulator", () => {
   });
 
   it("loads the DFA and PDA examples", () => {
-    expect(run("dfa", dfaDiagram.nodes, dfaDiagram.edges, "101").status).toBe("accepted");
-    expect(run("dfa", dfaDiagram.nodes, dfaDiagram.edges, "11").status).toBe("rejected");
-    expect(run("dfa", div3Diagram.nodes, div3Diagram.edges, "110").status).toBe("accepted");
-    expect(run("dfa", div3Diagram.nodes, div3Diagram.edges, "1").status).toBe("rejected");
+    expect(run("dfa", dfaEnds101Diagram.nodes, dfaEnds101Diagram.edges, "101").status).toBe("accepted");
+    expect(run("dfa", dfaEnds101Diagram.nodes, dfaEnds101Diagram.edges, "11").status).toBe("rejected");
+    expect(run("dfa", dfaDiv3Diagram.nodes, dfaDiv3Diagram.edges, "110").status).toBe("accepted");
+    expect(run("dfa", dfaDiv3Diagram.nodes, dfaDiv3Diagram.edges, "1").status).toBe("rejected");
     expect(run("dfa", nfaEnds101Diagram.nodes, nfaEnds101Diagram.edges, "101").status).toBe("accepted");
     expect(run("dfa", nfaEnds101Diagram.nodes, nfaEnds101Diagram.edges, "101").steps).toBe(3);
     expect(run("dfa", nfaEnds101Diagram.nodes, nfaEnds101Diagram.edges, "100").status).toBe("rejected");
-    expect(run("pda", pdaDiagram.nodes, pdaDiagram.edges, "").status).toBe("accepted");
-    const pda = compile("pda", pdaDiagram.nodes, pdaDiagram.edges);
+    expect(run("pda", pda0n1nDiagram.nodes, pda0n1nDiagram.edges, "").status).toBe("accepted");
+    const pda = compile("pda", pda0n1nDiagram.nodes, pda0n1nDiagram.edges);
     const started = createEngine(pda, tokenize("0011"));
     expect(started.frontier.map((id) => started.configs.find((config) => config.id === id)?.state)).toContain("q1");
-    expect(run("pda", pdaDiagram.nodes, pdaDiagram.edges, "0011").status).toBe("accepted");
-    expect(run("pda", pdaDiagram.nodes, pdaDiagram.edges, "001").status).toBe("rejected");
+    expect(run("pda", pda0n1nDiagram.nodes, pda0n1nDiagram.edges, "0011").status).toBe("accepted");
+    expect(run("pda", pda0n1nDiagram.nodes, pda0n1nDiagram.edges, "001").status).toBe("rejected");
+  });
+
+  it("pops a hash from the stack", () => {
+    const nodes = [node("q0", { initial: true }), node("q1", { accepting: true })];
+    const edges = [
+      edge("e1", "q0", "q0", "#,\\varepsilon\\to\\#"),
+      edge("e2", "q0", "q1", "\\varepsilon,\\#\\to\\varepsilon"),
+    ];
+    const machine = compile("pda", nodes, edges);
+    expect(machine.transitions.map((item) => [item.pop, item.push])).toEqual([
+      ["", ["#"]],
+      ["#", []],
+    ]);
+    expect(run("pda", nodes, edges, "#").status).toBe("accepted");
   });
 
   it("keeps an epsilon move after the last PDA symbol", () => {

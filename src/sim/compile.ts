@@ -41,6 +41,11 @@ export function tokenize(input: string): string[] {
       index += 1;
       continue;
     }
+    if (char === "\\" && (input[index + 1] === "$" || input[index + 1] === "#")) {
+      symbols.push(input[index + 1]);
+      index += 2;
+      continue;
+    }
     if (char === "\\") {
       let end = index + 1;
       while (end < input.length && /[A-Za-z]/.test(input[end])) end += 1;
@@ -56,7 +61,7 @@ export function tokenize(input: string): string[] {
 }
 
 function runtimeSymbol(symbol: string): string {
-  return symbol.replaceAll("\\$", "$");
+  return symbol.replaceAll("\\$", "$").replaceAll("\\#", "#");
 }
 
 function tokenizePush(value: string): string[] {

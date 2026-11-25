@@ -4,20 +4,20 @@ function separateTo(source: string): string {
   return source.replace(/\\to(?=[A-Za-z])/g, "\\to ");
 }
 
-function escapeDollars(source: string): string {
-  return source.replace(/(?<!\\)\$/g, "\\$");
+function escapeSpecial(source: string): string {
+  return source.replace(/(?<!\\)\$/g, "\\$").replace(/(?<!\\)#/g, "\\#");
 }
 
 export function mathSource(label: string): { source: string; displayMode: boolean } {
   const trimmed = separateTo(label.trim());
   if (trimmed.startsWith("$$") && trimmed.endsWith("$$") && trimmed.length > 4) {
-    return { source: escapeDollars(trimmed.slice(2, -2)), displayMode: true };
+    return { source: escapeSpecial(trimmed.slice(2, -2)), displayMode: true };
   }
   if (trimmed.startsWith("$") && trimmed.endsWith("$") && trimmed.length > 2 && !trimmed.endsWith("\\$")) {
     const source = trimmed.slice(1, -1);
-    return { source: escapeDollars(source), displayMode: source.includes("\\begin") };
+    return { source: escapeSpecial(source), displayMode: source.includes("\\begin") };
   }
-  return { source: escapeDollars(trimmed), displayMode: trimmed.includes("\\begin") };
+  return { source: escapeSpecial(trimmed), displayMode: trimmed.includes("\\begin") };
 }
 
 const EPSILON = "\\varepsilon";
@@ -28,13 +28,13 @@ const INPUT_SYMBOLS: [string, string][] = [
 ];
 
 export function labelToInput(value: string): string {
-  const shown = value.replaceAll("\\$", "$");
+  const shown = value.replaceAll("\\$", "$").replaceAll("\\#", "#");
   return INPUT_SYMBOLS.reduce((text, [command, symbol]) => text.replaceAll(command, symbol), shown);
 }
 
 export function inputToLabel(value: string): string {
   const labeled = INPUT_SYMBOLS.reduce((text, [command, symbol]) => text.replaceAll(symbol, command), value);
-  return labeled.replaceAll("$", "\\$");
+  return labeled.replaceAll("$", "\\$").replaceAll("#", "\\#");
 }
 
 export function displayEdgeLabel(lines: string[], kind: AutomataKind): string {

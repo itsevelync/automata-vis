@@ -34,6 +34,8 @@ describe("formatLabel", () => {
     expect(mathSource("1\\tob").source).toBe("1\\to b");
     expect(mathSource("$").source).toBe("\\$");
     expect(mathSource("\\$").source).toBe("\\$");
+    expect(mathSource("#").source).toBe("\\#");
+    expect(mathSource("\\#").source).toBe("\\#");
     expect(formatLabel("a,Z\\toaZ")).toBe("$a,Z\\to aZ$");
   });
 });
@@ -44,6 +46,8 @@ describe("label input symbols", () => {
     expect(inputToLabel("\u03b5\u2423")).toBe("\\varepsilon\\textvisiblespace");
     expect(inputToLabel("$")).toBe("\\$");
     expect(labelToInput("\\$")).toBe("$");
+    expect(inputToLabel("#")).toBe("\\#");
+    expect(labelToInput("\\#")).toBe("#");
   });
 });
 

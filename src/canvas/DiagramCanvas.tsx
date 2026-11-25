@@ -108,6 +108,12 @@ export function DiagramCanvas() {
   }
 
   useEffect(() => {
+    const saved = useDiagram.getState().nodes;
+    if (saved.length === 0) return;
+    window.setTimeout(() => fit(saved), 0);
+  }, []);
+
+  useEffect(() => {
     setExampleId(null);
     setExamplesOpen(false);
   }, [automataKind]);

@@ -46,6 +46,25 @@ interface DiagramState {
   clear: () => void;
 }
 
+const STORAGE_KEY = "automata-vis-diagram";
+
+function storedDiagram(): Partial<DiagramState> | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<DiagramState>;
+    if (!Array.isArray(parsed.nodes) || !Array.isArray(parsed.edges)) return null;
+    if (parsed.automataKind !== "dfa" && parsed.automataKind !== "pda" && parsed.automataKind !== "tm") {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+const stored = storedDiagram();
+
 function occupied(nodes: DiagramNode[], col: number, row: number, ignoreId?: string) {
   return nodes.some(
     (node) => node.id !== ignoreId && node.col === col && node.row === row,
@@ -53,15 +72,15 @@ function occupied(nodes: DiagramNode[], col: number, row: number, ignoreId?: str
 }
 
 export const useDiagram = create<DiagramState>((set, get) => ({
-  automataKind: "dfa",
-  nodes: [],
-  edges: [],
-  nodeDistance: "3cm",
+  automataKind: stored?.automataKind ?? "dfa",
+  nodes: stored?.nodes ?? [],
+  edges: stored?.edges ?? [],
+  nodeDistance: stored?.nodeDistance ?? "3cm",
   nodeSize: DEFAULT_STATE_NODE_SIZE,
   displaySizes: {},
-  scale: 1,
+  scale: stored?.scale ?? 1,
   selection: null,
-  edgeSeq: 1,
+  edgeSeq: stored?.edgeSeq ?? 1,
   addNode: (col, row) => {
     const { nodes } = get();
     if (occupied(nodes, col, row)) return false;
@@ -215,5 +234,19 @@ export const useDiagram = create<DiagramState>((set, get) => ({
     set({ nodes: [], edges: [], selection: null, edgeSeq: 1, displaySizes: {} });
   },
 }));
+
+useDiagram.subscribe((state) => {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({
+      automataKind: state.automataKind,
+      nodes: state.nodes,
+      edges: state.edges,
+      nodeDistance: state.nodeDistance,
+      scale: state.scale,
+      edgeSeq: state.edgeSeq,
+    }),
+  );
+});
 
 export type { Bend, LabelPos, Side };

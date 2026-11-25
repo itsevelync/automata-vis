@@ -26,7 +26,7 @@ function run(kind: "dfa" | "pda" | "tm", nodes: DiagramNode[], edges: DiagramEdg
 
 describe("simulator", () => {
   it("tokenizes characters and latex commands", () => {
-    expect(tokenize("01 \\textvisiblespace\\varepsilon")).toEqual(["0", "1", "\\textvisiblespace"]);
+    expect(tokenize("01 \\sqcup\\varepsilon")).toEqual(["0", "1", "\\sqcup"]);
     expect(tokenize("\\#\\$")).toEqual(["#", "$"]);
   });
 

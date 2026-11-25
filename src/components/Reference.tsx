@@ -53,8 +53,8 @@ export default function Reference({ kind }: { kind: "dfa" | "pda" | "tm" }) {
           <li>
             <LatexLabel label="\Gamma" /> is the <i>tape</i> alphabet.
             <ul className="muted dash">
-              <li><LatexLabel label="\textvisiblespace\in\Gamma" /> (a blank space on the tape)</li>
-              <li><LatexLabel label="\textvisiblespace\notin\Sigma" /></li>
+              <li><LatexLabel label="\sqcup\in\Gamma" /> (a blank space on the tape)</li>
+              <li><LatexLabel label="\sqcup\notin\Sigma" /></li>
               <li><LatexLabel label="\Sigma \subsetneq \Gamma" /></li>
             </ul>
           </li>

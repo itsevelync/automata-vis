@@ -51,9 +51,9 @@ The picture below is the motivating example. It uses the legacy spelling `right 
     (q1) edge node [below=0.8cm] {$1\to 1,L$} (q2)
     (q2) edge node [below] {$x\to x,R$} (q3)
     (q2) edge [loop above] node {$y\to y,L$} ()
-    (q1) edge node {$\textvisiblespace \to \textvisiblespace,R$} (qa)
-    (q0) edge node [right=0.5em]{$\textvisiblespace \to \textvisiblespace,R$} (qa)
-    (q9) edge [bend right] node [above=.5em]{$\textvisiblespace \to \textvisiblespace,R$} (qa);
+    (q1) edge node {$\sqcup \to \sqcup,R$} (qa)
+    (q0) edge node [right=0.5em]{$\sqcup \to \sqcup,R$} (qa)
+    (q9) edge [bend right] node [above=.5em]{$\sqcup \to \sqcup,R$} (qa);
 \end{tikzpicture}
 ```
 
@@ -99,9 +99,9 @@ The same layout, as export should emit it:
     (q1) edge node [below=0.8cm] {$1\to 1,L$} (q2)
     (q2) edge node [below] {$x\to x,R$} (q3)
     (q2) edge [loop above] node {$y\to y,L$} ()
-    (q1) edge node {$\textvisiblespace \to \textvisiblespace,R$} (qa)
-    (q0) edge node [right=0.5em]{$\textvisiblespace \to \textvisiblespace,R$} (qa)
-    (q9) edge [bend right] node [above=.5em]{$\textvisiblespace \to \textvisiblespace,R$} (qa);
+    (q1) edge node {$\sqcup \to \sqcup,R$} (qa)
+    (q0) edge node [right=0.5em]{$\sqcup \to \sqcup,R$} (qa)
+    (q9) edge [bend right] node [above=.5em]{$\sqcup \to \sqcup,R$} (qa);
 \end{tikzpicture}
 ```
 
@@ -177,7 +177,7 @@ Positions are integer grid cells. `row` increases downward, so the next row is `
     {
       "source": "q9",
       "target": "qa",
-      "label": "\\textvisiblespace \\to \\textvisiblespace,R",
+      "label": "\\sqcup \\to \\sqcup,R",
       "bend": "right",
       "labelPos": { "side": "above", "distance": ".5em" }
     }

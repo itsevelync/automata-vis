@@ -94,7 +94,7 @@ describe("generateTikZ", () => {
             id: "e1",
             source: "q9",
             target: "qa",
-            label: "\\textvisiblespace \\to \\textvisiblespace,R",
+            label: "\\sqcup \\to \\sqcup,R",
             bend: "right",
             labelPos: { side: "above", distance: ".5em" },
           },
@@ -102,7 +102,7 @@ describe("generateTikZ", () => {
       ),
     );
     expect(tikz).toContain(
-      "(q9) edge [bend right] node [above=.5em] {$\\textvisiblespace \\to \\textvisiblespace,R$} (qa);",
+      "(q9) edge [bend right] node [above=.5em] {$\\sqcup \\to \\sqcup,R$} (qa);",
     );
     expect(tikz).toContain("\\node[state,accepting] (qa) [right=of q9]");
   });

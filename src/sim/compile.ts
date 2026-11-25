@@ -2,7 +2,7 @@ import { splitTransition, transitionText, unescapeSpecial } from "../model/label
 import type { AutomataKind, DiagramEdge, DiagramNode } from "../model/types";
 
 export const EPSILON = "\\varepsilon";
-export const BLANK = "\\textvisiblespace";
+export const BLANK = "\\sqcup";
 export const STEP_CAP = 500;
 export const BRANCH_CAP = 80;
 export const EPSILON_DEPTH = 32;

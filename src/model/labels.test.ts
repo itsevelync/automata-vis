@@ -42,8 +42,8 @@ describe("formatLabel", () => {
 
 describe("label input symbols", () => {
   it("shows epsilon and visible space in the input", () => {
-    expect(labelToInput("\\varepsilon\\to\\textvisiblespace")).toBe("\u03b5\\to\u2423");
-    expect(inputToLabel("\u03b5\u2423")).toBe("\\varepsilon\\textvisiblespace");
+    expect(labelToInput("\\varepsilon\\to\\sqcup")).toBe("\u03b5\\to\u2423");
+    expect(inputToLabel("\u03b5\u2423")).toBe("\\varepsilon\\sqcup");
     expect(inputToLabel("$")).toBe("\\$");
     expect(labelToInput("\\$")).toBe("$");
     expect(inputToLabel("#")).toBe("\\#");
@@ -70,8 +70,8 @@ describe("transition labels", () => {
   it("renders empty inputs as varepsilon", () => {
     expect(displayEdgeLabel([""], "dfa")).toBe("\\varepsilon");
     expect(displayEdgeLabel(["0", "1"], "dfa")).toBe("0,1");
-    expect(displayEdgeLabel(["1\\to,R"], "tm")).toBe("1\\to\\textvisiblespace,R");
-    expect(displayEdgeLabel([""], "tm")).toBe("\\textvisiblespace\\to\\textvisiblespace,R");
+    expect(displayEdgeLabel(["1\\to,R"], "tm")).toBe("1\\to\\sqcup,R");
+    expect(displayEdgeLabel([""], "tm")).toBe("\\sqcup\\to\\sqcup,R");
     expect(displayEdgeLabel(["a,\\to"], "pda")).toBe("a,\\varepsilon\\to\\varepsilon");
     expect(displayEdgeLabel([""], "pda")).toBe("\\varepsilon,\\varepsilon\\to\\varepsilon");
     expect(transitionText(undefined, "\\varepsilon,\\varepsilon\\to\\$", "pda")).toEqual([

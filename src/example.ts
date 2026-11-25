@@ -176,19 +176,19 @@ export const tm1n2Diagram: Diagram = {
       label: "y\\to y,L",
       loop: "above",
     },
-    { id: "e15", source: "q1", target: "qa", label: "\\textvisiblespace \\to \\textvisiblespace,R" },
+    { id: "e15", source: "q1", target: "qa", label: "\\sqcup \\to \\sqcup,R" },
     {
       id: "e16",
       source: "q0",
       target: "qa",
-      label: "\\textvisiblespace \\to \\textvisiblespace,R",
+      label: "\\sqcup \\to \\sqcup,R",
       labelPos: { side: "right", distance: "0.5em" },
     },
     {
       id: "e17",
       source: "q9",
       target: "qa",
-      label: "\\textvisiblespace \\to \\textvisiblespace,R",
+      label: "\\sqcup \\to \\sqcup,R",
       bend: "right",
       labelPos: { side: "above", distance: ".5em" },
     },
@@ -299,7 +299,7 @@ export const wHashWDiagram: Diagram = {
     { id: "e14", source: "q6", target: "q6", label: "x\\to x,R", loop: "below" },
     { id: "e15", source: "q0", target: "q7", label: "\\#\\to\\#,R", bend: "left" },
     { id: "e16", source: "q7", target: "q7", label: "x\\to x,R", loop: "left" },
-    { id: "e17", source: "q7", target: "qa", label: "\\textvisiblespace \\to \\textvisiblespace,R" },
+    { id: "e17", source: "q7", target: "qa", label: "\\sqcup \\to \\sqcup,R" },
   ],
 };
 
@@ -311,7 +311,7 @@ export const binarySuccessorDiagram: Diagram = {
     { id: "qa", label: "q_{a}", col: 2, row: 0, accepting: true },
   ],
   edges: [
-    { id: "e1", source: "q0", target: "q1", label: "\\textvisiblespace \\to \\textvisiblespace,L" },
+    { id: "e1", source: "q0", target: "q1", label: "\\sqcup \\to \\sqcup,L" },
     { id: "e2", source: "q1", target: "qa", label: "0\\to1,R" },
     { id: "e3", source: "q1", target: "q1", label: "1\\to0,L", loop: "below" },
     {

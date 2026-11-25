@@ -8,7 +8,7 @@ export function LatexLabel({ label, className="example-math" }: { label: string;
     throwOnError: false,
     displayMode,
     macros: {
-      "\\textvisiblespace":
+      "\\sqcup":
         "\\kern.07em\\rule{0.4pt}{0.3ex}\\rule{0.28em}{0.4pt}\\rule{0.4pt}{0.3ex}\\kern.07em",
     },
   });

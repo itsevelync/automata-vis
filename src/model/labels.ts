@@ -30,7 +30,7 @@ export function mathSource(label: string): { source: string; displayMode: boolea
 }
 
 const EPSILON = "\\varepsilon";
-const BLANK = "\\textvisiblespace";
+const BLANK = "\\sqcup";
 const INPUT_SYMBOLS: [string, string][] = [
   [BLANK, "\u2423"],
   [EPSILON, "\u03b5"],

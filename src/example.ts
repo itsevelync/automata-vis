@@ -241,6 +241,90 @@ export const abcDiagram: Diagram = {
   ],
 };
 
+export const wHashWDiagram: Diagram = {
+  defaults,
+  nodes: [
+    { id: "qa", label: "q_{a}", col: 0, row: 0, accepting: true },
+    { id: "q1", label: "q_{1}", col: 1, row: 0 },
+    { id: "q2", label: "q_{2}", col: 2, row: 0 },
+    { id: "q7", label: "q_{7}", col: 0, row: 1 },
+    { id: "q0", label: "q_{0}", col: 1, row: 1, initial: true },
+    { id: "q4", label: "q_{4}", col: 2, row: 1 },
+    { id: "q3", label: "q_{3}", col: 3, row: 1 },
+    { id: "q5", label: "q_{5}", col: 1, row: 2 },
+    { id: "q6", label: "q_{6}", col: 2, row: 2 },
+  ],
+  edges: [
+    { id: "e1", source: "q1", target: "q2", label: "\\#\\to\\#,R" },
+    {
+      id: "e2",
+      source: "q1",
+      target: "q1",
+      lines: ["0\\to0,R", "1\\to1,R"],
+      label: joinLabels(["0\\to0,R", "1\\to1,R"]),
+      loop: "above",
+    },
+    { id: "e3", source: "q2", target: "q2", label: "x\\to x,R", loop: "above" },
+    { id: "e4", source: "q0", target: "q1", label: "0\\to x,R" },
+    { id: "e5", source: "q2", target: "q3", label: "0\\to x,L", bend: "left" },
+    { id: "e6", source: "q3", target: "q3", label: "x\\to x,L", loop: "right" },
+    { id: "e7", source: "q3", target: "q4", label: "\\#\\to\\#,L" },
+    {
+      id: "e8",
+      source: "q4",
+      target: "q4",
+      lines: ["0\\to0,L", "1\\to1,L"],
+      label: joinLabels(["0\\to0,L", "1\\to1,L"]),
+      loop: "above",
+    },
+    { id: "e9", source: "q4", target: "q0", label: "x\\to x,R" },
+    {
+      id: "e10",
+      source: "q6",
+      target: "q3",
+      label: "1\\to x,L",
+      bend: "right",
+      labelPos: { side: "right", distance: "0.3cm" },
+    },
+    { id: "e11", source: "q5", target: "q6", label: "\\#\\to\\#,R" },
+    { id: "e12", source: "q0", target: "q5", label: "1\\to x,R" },
+    {
+      id: "e13",
+      source: "q5",
+      target: "q5",
+      lines: ["0\\to0,R", "1\\to1,R"],
+      label: joinLabels(["0\\to0,R", "1\\to1,R"]),
+      loop: "left",
+    },
+    { id: "e14", source: "q6", target: "q6", label: "x\\to x,R", loop: "below" },
+    { id: "e15", source: "q0", target: "q7", label: "\\#\\to\\#,R", bend: "left" },
+    { id: "e16", source: "q7", target: "q7", label: "x\\to x,R", loop: "left" },
+    { id: "e17", source: "q7", target: "qa", label: "\\textvisiblespace \\to \\textvisiblespace,R" },
+  ],
+};
+
+export const binarySuccessorDiagram: Diagram = {
+  defaults,
+  nodes: [
+    { id: "q0", label: "q_{0}", col: 0, row: 0, initial: true },
+    { id: "q1", label: "q_{1}", col: 1, row: 0 },
+    { id: "qa", label: "q_{a}", col: 2, row: 0, accepting: true },
+  ],
+  edges: [
+    { id: "e1", source: "q0", target: "q1", label: "\\textvisiblespace \\to \\textvisiblespace,L" },
+    { id: "e2", source: "q1", target: "qa", label: "0\\to1,R" },
+    { id: "e3", source: "q1", target: "q1", label: "1\\to0,L", loop: "below" },
+    {
+      id: "e4",
+      source: "q0",
+      target: "q0",
+      lines: ["0\\to0,R", "1\\to1,R"],
+      label: joinLabels(["0\\to0,R", "1\\to1,R"]),
+      loop: "below",
+    },
+  ],
+};
+
 const DIAGRAMS = {
   dfa101: dfaEnds101Diagram,
   nfa101: nfaEnds101Diagram,
@@ -250,6 +334,8 @@ const DIAGRAMS = {
   wwr: wwRDiagram,
   abc: abcDiagram,
   tm1n2: tm1n2Diagram,
+  whw: wHashWDiagram,
+  successor: binarySuccessorDiagram,
 } as const;
 
 export const EXAMPLES: Record<AutomataKind, { id: string; label: string }[]> = {
@@ -264,7 +350,11 @@ export const EXAMPLES: Record<AutomataKind, { id: string; label: string }[]> = {
     { id: "wwr", label: "\\{ww^R\\mid w\\in\\Sigma^*\\}" },
     { id: "abc", label: "\\{a^ib^jc^k\\mid i=j\\lor i=k\\}" },
   ],
-  tm: [{ id: "tm1n2", label: "\\{1^{n^2}\\mid n\\in\\mathbb{N}\\}" }],
+  tm: [
+    { id: "tm1n2", label: "\\{1^{n^2}\\mid n\\in\\mathbb{N}\\}" },
+    { id: "whw", label: "\\{w\\#w\\mid w\\in\\Sigma^*\\}" },
+    { id: "successor", label: "\\text{Binary succession }x+1" },
+  ],
 };
 
 export function exampleFor(kind: AutomataKind): Diagram {

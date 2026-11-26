@@ -181,7 +181,7 @@ export function RunPanel() {
             </p>
           </div>
           {automataKind !== "tm" && <p className="muted">Note: &epsilon;-transitions are taken before the next symbol is read from the input.</p>}
-          <p>Current Configuration</p>
+          <p>Current Configuration {live.length === 0 && <span className="muted">No tapes possible</span>}</p>
           {automataKind === "dfa" && <p>
             State:{" "}
             {live.length === 0 ? (

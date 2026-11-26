@@ -207,7 +207,7 @@ export default function About() {
       <p>
         The educational materials that informed this project are from{" "}
         <a href="https://faculty.cc.gatech.edu/~josephjaeger/" target="_blank">
-          Dr. Joseph Jaeger
+          Professor Joseph Jaeger
         </a>{" "}
         and Georgia Tech's CS 4510 course.
       </p>

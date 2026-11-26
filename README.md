@@ -17,7 +17,7 @@ Supports importing and exporting state diagrams as LaTeX with TikZ.
 
 This website was developed using [Vite](https://vite.dev/) and [React](https://react.dev/), with icons from [React Icons](https://react-icons.github.io/react-icons/) and math typesetting from [KaTeX](https://katex.org/).
 
-The educational materials that informed this project are from [Dr. Joseph Jaeger](https://faculty.cc.gatech.edu/~josephjaeger/) and Georgia Tech's CS 4510 course.
+The educational materials that informed this project are from [Professor Joseph Jaeger](https://faculty.cc.gatech.edu/~josephjaeger/) and Georgia Tech's CS 4510 course.
 
 ## Contributions
 

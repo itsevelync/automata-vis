@@ -59,20 +59,6 @@ describe("generateTikZ", () => {
     expect(tikz).not.toContain("right=7cm of");
   });
 
-  it("uses the diagonal center distance for an equal grid step", () => {
-    const tikz = generateTikZ(
-      diagram(
-        [
-          { id: "q0", label: "q_0", col: 0, row: 0 },
-          { id: "q3", label: "q_3", col: -1, row: 1 },
-        ],
-        [],
-        "1.5cm",
-      ),
-    );
-    expect(tikz).toContain("\\node[state] (q3) [below left=2.12132cm of q0] {$q_3$};");
-  });
-
   it("uses independent center distances for a diagonal gap", () => {
     const tikz = generateTikZ(
       diagram([

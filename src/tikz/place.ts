@@ -71,9 +71,6 @@ export function relativePlacement(
     if (steps === 1) return `${key}=of ${anchor.id}`;
     return `${key}=${formatLength(multiplyLength(distance, steps))} of ${anchor.id}`;
   }
-  if (stepsX === stepsY) {
-    return `${key}=${formatLength(multiplyLength(distance, stepsX * Math.SQRT2))} of ${anchor.id}`;
-  }
   const vertical = formatLength(multiplyLength(distance, stepsY));
   const horizontal = formatLength(multiplyLength(distance, stepsX));
   return `${key}=${vertical} and ${horizontal} of ${anchor.id}`;

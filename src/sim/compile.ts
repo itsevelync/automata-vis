@@ -3,7 +3,7 @@ import type { AutomataKind, DiagramEdge, DiagramNode } from "../model/types";
 
 export const EPSILON = "\\varepsilon";
 export const BLANK = "\\sqcup";
-export const STEP_CAP = 2000;
+export const STEP_CAP = 600;
 export const BRANCH_CAP = 80;
 export const EPSILON_DEPTH = 32;
 export const INPUT_CAP = 1000;

@@ -6,7 +6,7 @@ export const BLANK = "\\sqcup";
 export const STEP_CAP = 600;
 export const BRANCH_CAP = 80;
 export const EPSILON_DEPTH = 32;
-export const INPUT_CAP = 1000;
+export const INPUT_CAP = 50;
 
 export interface CompiledTransition {
   edgeId: string;
